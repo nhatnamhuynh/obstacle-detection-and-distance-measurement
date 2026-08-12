@@ -1,6 +1,5 @@
 #include "ultrasonic.h"
 #include "main.h"
-extern TIM_HandleTypeDef htim2;
 
 static uint32_t echo_time_us = 0; // time for the echo pulse width
 static uint32_t is_first_captured = 0; // 0 = waiting for rising edge, 1 = waiting for falling edge

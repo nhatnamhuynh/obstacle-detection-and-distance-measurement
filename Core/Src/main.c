@@ -21,7 +21,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "main.h"
 #include "ultrasonic.h"
 #include "moving_filter.h"
 #include "buzzer.h"
@@ -56,9 +55,15 @@ TIM_HandleTypeDef htim4;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-SensorData_t g_sensor_data;
-MovingFilter_t g_distance_filter;
-uint32_t g_last_sensor_scan = 0;
+// Global variables
+Led_t g_led;
+Button_t g_btn;
+Buzzer_t g_buzzer;
+MovingFilter_t g_filter;
+
+DistanceUnit_t g_current_unit = UNIT_CM; // default as cm
+
+uint32_t g_last_time_scan = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,40 +116,67 @@ int main(void)
   MX_TIM4_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  MovingFilter_Init(&g_distance_filter);
-  FSM_Init(&g_sensor_data);
-  LED_Init();
-  Buzzer_Init();
+  LED_Init (&g_led, 
+            GPIOB, GPIO_PIN_3, //green = PB3
+            GPIOB, GPIO_PIN_4, // yellow = PB4
+            GPIOB, GPIO_PIN_5); // red = PB5
+  
+  Buzzer_Init (&g_buzzer, &htim4, TIM_CHANNEL_3); // buzzer = TIM4_CH3
+
   Ultrasonic_Init();
+
+  MovingFilter_Init(&g_filter);
+
+  FSM_Init (&g_led, &g_buzzer);
+
+  Button_Init (&g_btn, GPIOA, GPIO_PIN_2); // Button = PA2
+
+  //Protocol (not merge yet)
   LCD_Init();
-  Button_Init();
   UART_Log_Init();
+
+  LCD_SendString ("System Initialized Successfully!\r\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    uint32_t current_time = HAL_GetTick();
+    // Interrupt for Button
+    if (Button_WasPressed (&g_btn)) {
+      if (g_current_unit == UNIT_CM) {
+        g_current_unit = UNIT_INCH;
+        LCD_SendString ("Switched Unit to INCH");
+      }
+      else if (g_current_unit == UNIT_INCH) {
+        g_current_unit = UNIT_CM;
+        LCD_SendString ("Switched Unit to CM");
+      }
+    } 
 
-    // Sensor scanning and processing every 60ms
-    if (current_time - g_last_sensor_scan >= 60)
-    {
-      g_last_sensor_scan = current_time;
+    //Interrupt for checking the sensor every 50ms
+    if (HAL_GetTick() - g_last_time_scan >= 50) {
+      g_last_time_scan = HAL_GetTick();
 
       Ultrasonic_Trigger();
-      g_sensor_data.raw_distance = Ultrasonic_ReadDistance();
-      g_sensor_data.filtered_distance = MovingFilter_Update(&g_distance_filter, g_sensor_data.raw_distance);
-      
-      FSM_Update(&g_sensor_data);
-      
-      LED_Update(g_sensor_data.state);
-      Buzzer_Update(g_sensor_data.state, g_sensor_data.filtered_distance);
-      LCD_DisplaySensorData(&g_sensor_data);
+      float raw_cm = Ultrasonic_ReadDistance();
+      float filtered_cm = MovingFilter_Update(&g_filter, raw_cm);
+
+      FSM_Update(filtered_cm);
+
+      float dist_display = filtered_cm;
+      if (g_current_unit == UNIT_INCH) dist_display = filtered_cm / 2.54f; // 1 inch = 2.54 cm
+
+      SystemState_t current_state = FSM_GetState();
+
+      // add more functions that send data to the lcd screen
     }
 
-    // UART log
-    UART_Log_Process(&g_sensor_data);
+    // Led and Buzzer will always wait for being triggered
+    LED_Update(&g_led);
+    Buzzer_Update (&g_buzzer);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -430,7 +462,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  Button_EXTI_Callback(GPIO_Pin, &g_sensor_data);
+  Button_EXTI_Callback(&g_btn, GPIO_Pin);
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)

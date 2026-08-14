@@ -6,6 +6,6 @@
 void Ultrasonic_Init(void);
 void Ultrasonic_Trigger(void);
 float Ultrasonic_ReadDistance(void);
-void Ultrasonic_CaptureCallback(TIM_HandleTypeDef *htim);
+// the interrupt function is included in the HAL library so we dont need to declare it anymore
 
 #endif /* __ULTRASONIC_H */

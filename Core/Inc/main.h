@@ -42,10 +42,10 @@ extern "C" {
 
 // FSM
 typedef enum {
-  STATE_SAFE = 0,
+  STATE_OUT_OF_RANGE = 0,
+  STATE_SAFE,
   STATE_WARNING,
   STATE_DANGER,
-  STATE_OUT_OF_RANGE
 } SystemState_t;
 
 //Unit transformation

@@ -55,7 +55,6 @@ typedef enum {
 } DistanceUnit_t;
 
 typedef struct {
-  float raw_distance;   // from HC-SR04 sensor (cm)
   float filtered_distance;       // after filtering (moving average) (cm)
   DistanceUnit_t unit;
   SystemState_t state;

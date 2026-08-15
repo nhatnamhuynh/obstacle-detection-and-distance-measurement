@@ -15,7 +15,6 @@ static void delay_us(uint32_t us) {                         // approximate delay
 }
 
 void Ultrasonic_Init(void) {
-    // TODO: Call HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1)
     echo_time_us = 0;       // reset all variables at init
     is_first_captured = 0;
     posedge_time = 0;
@@ -26,7 +25,6 @@ void Ultrasonic_Init(void) {
 }
 
 void Ultrasonic_Trigger(void) {
-    // TODO: Set TRIG_PIN HIGH -> delay 10us -> Set TRIG_PIN LOW
     is_first_captured = 0;
     __HAL_TIM_SET_CAPTUREPOLARITY(&htim2, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING); // wait for rising edge
 
@@ -47,7 +45,6 @@ float Ultrasonic_ReadDistance(void) {
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
-    // TODO: Measure pulse width on TIM2 Channel 1 (Rising to Falling edge)
     if (htim->Instance == TIM2 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1) {
         if (is_first_captured == 0) {
             posedge_time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);

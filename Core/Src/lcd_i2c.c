@@ -91,19 +91,25 @@ void LCD_DisplaySensorData(const SensorData_t *sensor_data) {
     else unit_str = "in";
 
     switch (sensor_data->state){
-        case 0: state_str = "SAFE";
-                break;
-        case 1: state_str = "WARNING";
-                break;
-        case 2: state_str = "DANGER";
-                break;
-        case 3: state_str = "OUT OF RANGE";
-                break;
-        default: break;
+        case STATE_SAFE: 
+            state_str = "SAFE";
+            break;
+        case STATE_WARNING: 
+            state_str = "WARNING";
+            break;
+        case STATE_DANGER: 
+            state_str = "DANGER";
+            break;
+        case STATE_OUT_OF_RANGE: 
+            state_str = "OUT OF RANGE";
+            break;
+        default: 
+            state_str = "UNKNOWN";
+            break;
     }
 
     snprintf(line1, sizeof(line1), "Dist: %-6.1f %-2s", sensor_data->filtered_distance, unit_str);
-    snprintf(line2, sizeof(line2), "%-10s", state_str);
+    snprintf(line2, sizeof(line2), "%-12s", state_str);
 
     LCD_SetCursor(0, 0);
     LCD_SendString(line1);

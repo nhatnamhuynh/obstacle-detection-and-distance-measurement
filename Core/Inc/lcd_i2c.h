@@ -10,14 +10,10 @@
 #define PIN_EN (1 << 2)
 #define BACKLIGHT_BIT (1 << 3)
 
-static void LCD_WriteNiblle(uint8_t nibble, uint2_t rs);
-static void LCD_SendCmd(uint8 cmd);
-static void LCD_SendData(uint8_t data);
-
 void LCD_Init(void);
 void LCD_Clear(void);
 void LCD_SetCursor(uint8_t row, uint8_t col);
-static void LCD_SendString(const char *str);
+void LCD_SendString(const char *str);
 void LCD_DisplaySensorData(const SensorData_t *sensor_data);
 
 #endif /* __LCD_I2C_H */

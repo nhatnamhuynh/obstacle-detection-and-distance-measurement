@@ -82,38 +82,44 @@ void LCD_SendString(const char *str) {
 
 void LCD_DisplaySensorData(const SensorData_t *sensor_data) {
     // TODO: Format string (Line 1: Distance + Unit, Line 2: State) and print to LCD
-    char line1[17];
-    char line2[17];
-    const char* unit_str = "cm";
-    const char* state_str = "UNKNOWN";
+    static uint32_t last_lcd = 0;
+    uint32_t current_time = HAL_GetTick();
+    if (current_time - last_lcd >= LCD_INTERVAL_MS){
+        char line1[17];
+        char line2[17];
+        const char* unit_str = "cm";
+        const char* state_str = "UNKNOWN";
 
-    if (sensor_data->unit == 0) unit_str = "cm";
-    else unit_str = "in";
+        if (sensor_data->unit == 0) unit_str = "cm";
+        else unit_str = "in";
 
-    switch (sensor_data->state){
-        case STATE_SAFE: 
-            state_str = "SAFE";
-            break;
-        case STATE_WARNING: 
-            state_str = "WARNING";
-            break;
-        case STATE_DANGER: 
-            state_str = "DANGER";
-            break;
-        case STATE_OUT_OF_RANGE: 
-            state_str = "OUT OF RANGE";
-            break;
-        default: 
-            state_str = "UNKNOWN";
-            break;
+        switch (sensor_data->state){
+            case STATE_SAFE: 
+                state_str = "SAFE";
+                break;
+            case STATE_WARNING: 
+                state_str = "WARNING";
+                break;
+            case STATE_DANGER: 
+                state_str = "DANGER";
+                break;
+            case STATE_OUT_OF_RANGE: 
+                state_str = "OUT OF RANGE";
+                break;
+            default: 
+                state_str = "UNKNOWN";
+                break;
+        }
+
+        snprintf(line1, sizeof(line1), "Dist: %-6.1f %-2s", sensor_data->filtered_distance, unit_str);
+        snprintf(line2, sizeof(line2), "%-12s", state_str);
+
+        LCD_SetCursor(0, 0);
+        LCD_SendString(line1);
+
+        LCD_SetCursor(1, 0);
+        LCD_SendString(line2);
+
+        last_lcd = current_time;
     }
-
-    snprintf(line1, sizeof(line1), "Dist: %-6.1f %-2s", sensor_data->filtered_distance, unit_str);
-    snprintf(line2, sizeof(line2), "%-12s", state_str);
-
-    LCD_SetCursor(0, 0);
-    LCD_SendString(line1);
-
-    LCD_SetCursor(1, 0);
-    LCD_SendString(line2);
 }

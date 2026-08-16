@@ -9,7 +9,7 @@ void Button_Init(Button_t *btn, GPIO_TypeDef *port, uint16_t pin) {
     btn->last_press = 0;
 }
 uint8_t Button_WasPressed (Button_t *btn) {
-    if (btn == NULL) return;
+    if (btn == NULL) return 0;
 
     if (btn->flag) {
         btn->flag = 0;
@@ -31,12 +31,12 @@ void Button_EXTI_Callback(Button_t *btn, uint16_t GPIO_pin) {
 }
 
 void HandleUnitButton (Button_t *btn, SensorData_t *data) {
-  if (Button_WasPressed (&btn)) {
-      if (data->unit == UNIT_CM) {
-        data->unit = UNIT_INCH;
-      }
-      else if (data->unit == UNIT_INCH) {
-        data->unit = UNIT_CM;
-      }
-    } 
+    if (Button_WasPressed (btn)) {
+            if (data->unit == UNIT_CM) {
+                data->unit = UNIT_INCH;
+            }
+            else if (data->unit == UNIT_INCH) {
+                data->unit = UNIT_CM;
+            }
+        } 
 }

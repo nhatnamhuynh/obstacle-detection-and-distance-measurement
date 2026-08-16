@@ -157,6 +157,9 @@ int main(void)
     LED_Update(&g_led, g_data.state);
     Buzzer_Update (&g_buzzer, g_data.state);
 
+    LCD_DisplaySensorData(&g_data);
+    UART_Log_Process(&g_data);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -445,10 +448,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   Button_EXTI_Callback(&g_btn, GPIO_Pin);
 }
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
-  Ultrasonic_CaptureCallback(htim);
-}
+/* TIM input-capture callback is implemented in `ultrasonic.c`.
+ * Removing the forwarding call to `Ultrasonic_CaptureCallback` which
+ * was not declared/defined and caused an implicit-declaration warning.
+ */
 /* USER CODE END 4 */
 
 /**

@@ -21,6 +21,10 @@ endif()
 # Set the project name
 set(CMAKE_PROJECT_NAME obstacle-detection-and-distance-measurement)
 
+if(NOT CMAKE_TOOLCHAIN_FILE)
+include("cmake/gcc-arm-none-eabi.cmake")
+endif()
+
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
@@ -54,6 +58,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/lcd_i2c.c
     Core/Src/button_exti.c
     Core/Src/uart_log.c
+    Core/Src/main.c
 )
 
 # Add include paths
@@ -74,4 +79,10 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
 
     # Add user defined libraries
+)
+
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.hex
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${CMAKE_PROJECT_NAME}.bin
+    COMMENT "Building HEX and BIN files"
 )

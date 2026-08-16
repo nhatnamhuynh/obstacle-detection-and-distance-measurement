@@ -10,6 +10,8 @@
 #define PIN_EN (1 << 2)
 #define BACKLIGHT_BIT (1 << 3)
 
+#define LCD_INTERVAL_MS 200
+
 void LCD_Init(void);
 void LCD_Clear(void);
 void LCD_SetCursor(uint8_t row, uint8_t col);

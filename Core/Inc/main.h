@@ -42,10 +42,10 @@ extern "C" {
 
 // FSM
 typedef enum {
-  STATE_SAFE = 0,
+  STATE_OUT_OF_RANGE = 0,
+  STATE_SAFE,
   STATE_WARNING,
   STATE_DANGER,
-  STATE_OUT_OF_RANGE
 } SystemState_t;
 
 //Unit transformation
@@ -55,7 +55,6 @@ typedef enum {
 } DistanceUnit_t;
 
 typedef struct {
-  float raw_distance;   // from HC-SR04 sensor (cm)
   float filtered_distance;       // after filtering (moving average) (cm)
   DistanceUnit_t unit;
   SystemState_t state;
@@ -93,11 +92,11 @@ void Error_Handler(void);
 #define ECHO_PORT GPIOA
 
 // LED
-#define LED_GREEN_PIN GPIO_PIN_3   // PB0 (Safe)
+#define LED_GREEN_PIN GPIO_PIN_3   // PB3 (Safe)
 #define LED_GREEN_PORT GPIOB
-#define LED_YELLOW_PIN GPIO_PIN_4  // PB1 (Warning)
+#define LED_YELLOW_PIN GPIO_PIN_4  // PB4 (Warning)
 #define LED_YELLOW_PORT GPIOB
-#define LED_RED_PIN GPIO_PIN_5     // PB2 (Danger)
+#define LED_RED_PIN GPIO_PIN_5     // PB5 (Danger)
 #define LED_RED_PORT GPIOB
 
 // Button and PWM Buzzer

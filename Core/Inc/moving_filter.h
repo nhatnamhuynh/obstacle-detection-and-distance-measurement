@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define FILTER_WINDOW_SIZE 5
+#define FILTER_WINDOW_SIZE 5    // moving filter, just change the number here if neccessary
 
 typedef struct {
     float buffer[FILTER_WINDOW_SIZE];

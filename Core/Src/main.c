@@ -61,10 +61,6 @@ Led_t g_led;
 Button_t g_btn;
 Buzzer_t g_buzzer;
 MovingFilter_t g_filter;
-
-DistanceUnit_t g_current_unit = UNIT_CM; // default as cm
-
-uint32_t g_last_time_scan = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,8 +71,6 @@ static void MX_TIM2_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-static void HandleUnitButton (void);
-static bool wait50ms (void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -146,18 +140,14 @@ int main(void)
   while (1)
   {
     // Interrupt for checking the button
-    HandleUnitButton();
-    g_data.unit = g_current_unit;
+    HandleUnitButton(&g_btn, &g_data);
 
     //Interrupt for checking the sensor every 50ms
-    if (wait50ms()) {
-      Ultrasonic_Trigger();
+    if (Ultrasonic_Trigger()) {
       float raw_cm = Ultrasonic_ReadDistance();
       float filtered_cm = MovingFilter_Update(&g_filter, raw_cm);
 
-      FSM_Update(filtered_cm, g_current_unit);
-      g_data.state = FSM_GetState();
-      g_data.filtered_distance = FSM_GetDistance(); // the distance that is already changed depending on the unit.
+      FSM_Update(filtered_cm, &g_data); // Update the FSM state and filtered distance
 
       // add more functions that send data to the lcd screen
     }
@@ -458,27 +448,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
   Ultrasonic_CaptureCallback(htim);
-}
-
-static void HandleUnitButton (void) {
-  if (Button_WasPressed (&g_btn)) {
-      if (g_current_unit == UNIT_CM) {
-        g_current_unit = UNIT_INCH;
-        LCD_SendString ("Switched Unit to INCH");
-      }
-      else if (g_current_unit == UNIT_INCH) {
-        g_current_unit = UNIT_CM;
-        LCD_SendString ("Switched Unit to CM");
-      }
-    } 
-}
-
-static bool wait50ms(void) {
-  if (HAL_GetTick() - g_last_time_scan >= 50) {
-    g_last_time_scan = HAL_GetTick();
-    return 1;
-  }
-  return 0;
 }
 /* USER CODE END 4 */
 

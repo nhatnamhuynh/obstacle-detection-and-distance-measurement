@@ -29,3 +29,14 @@ void Button_EXTI_Callback(Button_t *btn, uint16_t GPIO_pin) {
         }
     }
 }
+
+void HandleUnitButton (Button_t *btn, SensorData_t *data) {
+  if (Button_WasPressed (&btn)) {
+      if (data->unit == UNIT_CM) {
+        data->unit = UNIT_INCH;
+      }
+      else if (data->unit == UNIT_INCH) {
+        data->unit = UNIT_CM;
+      }
+    } 
+}

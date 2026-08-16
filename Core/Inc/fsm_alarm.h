@@ -11,7 +11,7 @@
 #define DIST_WARN_MIN_CM  10.0f
 
 void FSM_Init(Led_t *led, Buzzer_t *buzzer);
-void FSM_Update(float filtered_distance, DistanceUnit_t unit);
+void FSM_Update(float filtered_distance, SensorData_t *data);
 SystemState_t FSM_GetState (void);
 float FSM_GetDistance (void);
 

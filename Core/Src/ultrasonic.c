@@ -5,6 +5,7 @@ static volatile uint32_t echo_time_us = 0; // time for the echo pulse width
 static volatile uint32_t is_first_captured = 0; // 0 = waiting for rising edge, 1 = waiting for falling edge
 static volatile uint32_t posedge_time = 0; // time of the rising edge
 static volatile uint32_t negedge_time = 0; // time of the falling edge
+static volatile uint32_t last_time_scan = 0; // last time the sensor was scanned
 
 
 static void delay_us(uint32_t us) {                         // approximate delay
@@ -12,6 +13,13 @@ static void delay_us(uint32_t us) {                         // approximate delay
     while (count--) {
         __NOP();
     }
+}
+static bool wait50ms(void) {
+  if (HAL_GetTick() - last_time_scan >= 50) {
+    last_time_scan = HAL_GetTick();
+    return 1;
+  }
+  return 0;
 }
 
 void Ultrasonic_Init(void) {
@@ -24,13 +32,18 @@ void Ultrasonic_Init(void) {
     HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1); // init
 }
 
-void Ultrasonic_Trigger(void) {
-    is_first_captured = 0;
-    __HAL_TIM_SET_CAPTUREPOLARITY(&htim2, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING); // wait for rising edge
+bool Ultrasonic_Trigger(void) {
+    if (wait50ms()) {
+        is_first_captured = 0;
+        __HAL_TIM_SET_CAPTUREPOLARITY(&htim2, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING); // wait for rising edge
 
-    HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_SET);
-    delay_us(10);
-    HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_SET);
+        delay_us(10);
+        HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_RESET);
+        
+        return true;
+    }
+    return false;
 }
 
 float Ultrasonic_ReadDistance(void) {

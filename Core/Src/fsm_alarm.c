@@ -5,19 +5,14 @@
 static Led_t *pled = NULL;
 static Buzzer_t *pbuzzer = NULL;
 static SystemState_t current_state = STATE_OUT_OF_RANGE;
-static float TrueDistance = 0;
 
 void FSM_Init(Led_t *led, Buzzer_t *buzzer) {
     pled = led;
     pbuzzer = buzzer;
     current_state = STATE_OUT_OF_RANGE;
-    TrueDistance = 0;
-
-    if (pled != NULL) LED_SetState (pled, LED_STATE_OFF);
-    if (pbuzzer != NULL) Buzzer_SetMode (pbuzzer, BUZZER_MODE_OFF);
 }
 
-void FSM_Update(float filtered_distance, DistanceUnit_t unit) {
+void FSM_Update(float filtered_distance, SensorData_t *data) {
     SystemState_t new_state;
 
     if (filtered_distance < 0.0f || filtered_distance > 400.0f) {
@@ -28,17 +23,11 @@ void FSM_Update(float filtered_distance, DistanceUnit_t unit) {
 
     if (current_state != new_state) {
         current_state = new_state;
+        data->state = current_state;
     }
 
-    if (unit == UNIT_INCH) {
-        TrueDistance = filtered_distance / 2.54f;
-    } else TrueDistance = filtered_distance;
+    if (data->unit == UNIT_INCH) {
+        data->filtered_distance = filtered_distance / 2.54f;
+    } else data->filtered_distance = filtered_distance;
 }
 
-SystemState_t FSM_GetState (void) {
-    return current_state;
-}
-
-float FSM_GetDistance (void) {
-    return TrueDistance;
-}

@@ -16,4 +16,7 @@ void Button_Init(Button_t *btn, GPIO_TypeDef *port, uint16_t pin);
 uint8_t Button_WasPressed (Button_t *btn);
 void Button_EXTI_Callback(Button_t *btn, uint16_t GPIO_pin);
 
+void HandleUnitButton (Button_t *btn, SensorData_t *data);
+
+
 #endif /* __BUTTON_EXTI_H */

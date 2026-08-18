@@ -30,6 +30,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Core project settings
 project(${CMAKE_PROJECT_NAME})
+string(APPEND CMAKE_EXE_LINKER_FLAGS " -u _printf_float")
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
 # Enable CMake support for ASM and C languages
@@ -59,6 +60,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/button_exti.c
     Core/Src/uart_log.c
     Core/Src/main.c
+    Core/Src/display_test.c
 )
 
 # Add include paths

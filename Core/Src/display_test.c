@@ -17,7 +17,7 @@ void Display_RunHardwareTestbench(void) {
     HAL_Delay(2000);
 
     // ========================================================
-    // TESTCASE 1: Trạng thái SAFE, Đơn vị CM (Giả lập 60cm)
+    // TESTCASE 1: SAFE - 60cm
     // ========================================================
     g_data.unit = UNIT_CM;                  // by default
     FSM_Update(60.0f, &g_data);             
@@ -30,7 +30,7 @@ void Display_RunHardwareTestbench(void) {
     HAL_Delay(10000);
 
     // ========================================================
-    // TESTCASE 2: Trạng thái WARNING, Đơn vị CM (Giả lập 35cm)
+    // TESTCASE 2: WARNING - 35cm
     // ========================================================
     g_data.unit = UNIT_CM;
     FSM_Update(35.0f, &g_data);
@@ -43,24 +43,8 @@ void Display_RunHardwareTestbench(void) {
     HAL_Delay(10000);
 
     // ========================================================
-    // TESTCASE 3: Giả lập Nút Nhấn -> Chuyển sang Đơn vị INCH
+    // TESTCASE 3:DANGER - 10cm
     // ========================================================
-    // Bạn giả lập nút nhấn bằng cách thay đổi trực tiếp g_data.unit 
-    // và cập nhật lại FSM với cùng một mức khoảng cách
-    g_data.unit = UNIT_INCH;
-    FSM_Update(35.0f, &g_data); 
-    
-    LED_Update(&g_led, g_data.state);
-    Buzzer_Update(&g_buzzer, g_data.state);
-    LCD_DisplaySensorData(&g_data);
-    UART_Log_Process(&g_data);
-    
-    HAL_Delay(10000);
-
-    // ========================================================
-    // TESTCASE 4: Trạng thái DANGER, Đơn vị INCH (Giả lập 10cm)
-    // ========================================================
-    g_data.unit = UNIT_INCH;
     FSM_Update(10.0f, &g_data);
     
     LED_Update(&g_led, g_data.state);

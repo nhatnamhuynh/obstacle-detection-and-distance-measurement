@@ -13,22 +13,21 @@ extern Led_t g_led;
 extern Buzzer_t g_buzzer;
 
 void Display_RunHardwareTestbench(void) {
-    // Nếu bạn có một hàm UART riêng để in chuỗi log độc lập, hãy dùng nó ở đây
     LCD_SendString("--- START TESTBENCH ---");
     HAL_Delay(2000);
 
     // ========================================================
     // TESTCASE 1: Trạng thái SAFE, Đơn vị CM (Giả lập 60cm)
     // ========================================================
-    g_data.unit = UNIT_CM;                  // Cố định đơn vị
-    FSM_Update(60.0f, &g_data);             // FSM tự động tính toán state và gán vào g_data
+    g_data.unit = UNIT_CM;                  // by default
+    FSM_Update(60.0f, &g_data);             
     
-    LED_Update(&g_led, g_data.state);       // Kích hoạt ngoại vi theo trạng thái
+    LED_Update(&g_led, g_data.state);       
     Buzzer_Update(&g_buzzer, g_data.state);
-    LCD_DisplaySensorData(&g_data);         // Xuất ra màn hình LCD
-    UART_Log_Process(&g_data);              // Đẩy dữ liệu lên UART
+    LCD_DisplaySensorData(&g_data);         
+    UART_Log_Process(&g_data);              
     
-    HAL_Delay(3000); // Dừng 3 giây để bạn kịp quan sát phần cứng
+    HAL_Delay(10000);
 
     // ========================================================
     // TESTCASE 2: Trạng thái WARNING, Đơn vị CM (Giả lập 35cm)
@@ -41,7 +40,7 @@ void Display_RunHardwareTestbench(void) {
     LCD_DisplaySensorData(&g_data);
     UART_Log_Process(&g_data);
     
-    HAL_Delay(3000);
+    HAL_Delay(10000);
 
     // ========================================================
     // TESTCASE 3: Giả lập Nút Nhấn -> Chuyển sang Đơn vị INCH
@@ -56,7 +55,7 @@ void Display_RunHardwareTestbench(void) {
     LCD_DisplaySensorData(&g_data);
     UART_Log_Process(&g_data);
     
-    HAL_Delay(3000);
+    HAL_Delay(10000);
 
     // ========================================================
     // TESTCASE 4: Trạng thái DANGER, Đơn vị INCH (Giả lập 10cm)
@@ -69,7 +68,7 @@ void Display_RunHardwareTestbench(void) {
     LCD_DisplaySensorData(&g_data);
     UART_Log_Process(&g_data);
     
-    HAL_Delay(3000);
+    HAL_Delay(10000);
 
     // ========================================================
     // KẾT THÚC TESTBENCH

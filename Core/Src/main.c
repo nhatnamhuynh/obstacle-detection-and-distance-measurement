@@ -134,13 +134,9 @@ int main(void)
   //Protocol (not merge yet)
   LCD_Init();
   UART_Log_Init();
-
-  LCD_SendString ("System Initialized Successfully!\r\n");
-
   #if ENABLE_HARDWARE_TESTBENCH
     TestRunner_RunAll();
   #endif
-
   /* USER CODE END 2 */
 
   /* Infinite loop */

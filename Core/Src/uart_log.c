@@ -2,7 +2,7 @@
 
 void UART_Log_Init(void) {
     // TODO: Send startup log via HAL_UART_Transmit(&huart1, ...)
-    const static char init_data[] = "START LOGGING STATE DATA\r\n"; 
+    static const char init_data[] = "START LOGGING STATE DATA\r\n"; 
     HAL_UART_Transmit_IT(&huart1, (uint8_t *) init_data, sizeof(init_data) - 1);
 }
 

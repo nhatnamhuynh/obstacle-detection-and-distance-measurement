@@ -1,10 +1,9 @@
 #ifndef TEST_RUNNER_H
 #define TEST_RUNNER_H
 
-#define ENABLE_HARDWARE_TESTBENCH 1
+#include "main.h"
+#define ENABLE_HARDWARE_TESTBENCH 0
 
-#if ENABLE_HARDWARE_TESTBENCH
-    void TestRunner_RunAll(void);
-#endif
+void TestRunner_RunAll(void);
 
 #endif

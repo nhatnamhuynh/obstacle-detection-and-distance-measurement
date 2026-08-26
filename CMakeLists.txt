@@ -64,6 +64,10 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Tests/Src/actuators_test.c
     Tests/Src/input_test.c
     Tests/Src/test_runner.c
+    Tests/Src/test_buzzer.c
+    Tests/Src/test_lcd.c
+    Tests/Src/test_led.c
+    Tests/Src/test_uart.c
 )
 
 # Add include paths

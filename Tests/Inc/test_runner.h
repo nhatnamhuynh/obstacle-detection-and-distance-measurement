@@ -2,7 +2,9 @@
 #define TEST_RUNNER_H
 
 #include "main.h"
-#define ENABLE_HARDWARE_TESTBENCH 0
+#include <string.h>
+
+#define ENABLE_HARDWARE_TESTBENCH 1
 
 void TestRunner_RunAll(void);
 

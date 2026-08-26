@@ -31,8 +31,8 @@
 #include "uart_log.h"
 #include "test_led.h"
 #include "test_buzzer.h"
-#include <string.h> 
 #include "test_lcd.h"
+#include "test_runner.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -134,6 +134,7 @@ int main(void)
   //Protocol (not merge yet)
   LCD_Init();
   UART_Log_Init();
+
   #if ENABLE_HARDWARE_TESTBENCH
     TestRunner_RunAll();
   #endif

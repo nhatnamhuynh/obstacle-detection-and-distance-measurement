@@ -32,7 +32,6 @@ void Display_RunHardwareTestbench(void) {
     // ========================================================
     // TESTCASE 2: WARNING - 35cm
     // ========================================================
-    g_data.unit = UNIT_CM;
     FSM_Update(35.0f, &g_data);
     
     LED_Update(&g_led, g_data.state);
@@ -43,7 +42,7 @@ void Display_RunHardwareTestbench(void) {
     HAL_Delay(10000);
 
     // ========================================================
-    // TESTCASE 3:DANGER - 10cm
+    // TESTCASE 3: ANGER - 10cm
     // ========================================================
     FSM_Update(10.0f, &g_data);
     

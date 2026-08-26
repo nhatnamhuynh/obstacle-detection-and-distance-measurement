@@ -37,28 +37,32 @@ void LED_Init(Led_t *led,
 
 void LED_Update(Led_t *led, SystemState_t state) {
     if (led == NULL) return;
-    if (current_state == state) return;
-    current_state = state;
     uint32_t current_time = HAL_GetTick();
-    LED_AllOff(led);
 
-    switch (state) {
+    if (current_state != state) {
+        current_state = state;
+        led->last_toggle_time = current_time;
+        led->toggle_flag = 0;
+        LED_AllOff(led);
+    }
+
+    switch (current_state) {
         case STATE_OUT_OF_RANGE: break;
         case STATE_SAFE: 
             Led_WritePin (led->green_port, led->green_pin, 1);
             break;
         case STATE_WARNING: 
-            Led_WritePin (led->yellow_port, led->yellow_pin, 1);
             if (current_time - led->last_toggle_time >= 500) {
-                Led_WritePin (led->yellow_port, led->yellow_pin, !led->toggle_flag);
                 led->last_toggle_time = current_time;
+                led->toggle_flag = !led->toggle_flag; // Đảo trạng thái cờ
+                Led_WritePin(led->yellow_port, led->yellow_pin, led->toggle_flag);
             }
             break;
         case STATE_DANGER:
-            Led_WritePin (led->red_port, led->red_pin, 1);
             if (current_time - led->last_toggle_time >= 100) {
-                Led_WritePin (led->red_port, led->red_pin, !led->toggle_flag);
                 led->last_toggle_time = current_time;
+                led->toggle_flag = !led->toggle_flag; // Đảo trạng thái cờ
+                Led_WritePin(led->red_port, led->red_pin, led->toggle_flag);
             }
             break;
     }

@@ -55,17 +55,22 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/buzzer.c
     Core/Src/led.c
     Core/Src/fsm_alarm.c
-
     Core/Src/lcd_i2c.c
     Core/Src/button_exti.c
     Core/Src/uart_log.c
     Core/Src/main.c
-    Core/Src/display_test.c
+
+    Tests/Src/display_test.c
+    Tests/Src/actuators_test.c
+    Tests/Src/input_test.c
+    Tests/Src/test_runner.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    Core/Inc
+    Tests/Inc
 )
 
 # Add project symbols (macros)

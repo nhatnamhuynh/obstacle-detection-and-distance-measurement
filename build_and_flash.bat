@@ -45,4 +45,4 @@ popd
 REM flash 
 echo.
 echo STEP 4: FLASHING FIRMWARE TO TARGET MCU
-STM32_Programmer_CLI -c port=SWD sn=31FF6F064243333051530357 -w build/app_firmware.bin 0x08000000 -v -rst
+STM32_Programmer_CLI -c port=SWD -w build/app_firmware.bin 0x08000000 -v -rst

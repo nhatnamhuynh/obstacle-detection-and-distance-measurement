@@ -133,7 +133,10 @@ int main(void)
 
   LCD_SendString ("System Initialized Successfully!\r\n");
 
-  Display_RunHardwareTestbench();
+  #if ENABLE_HARDWARE_TESTBENCH
+    TestRunner_RunAll();
+  #endif
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

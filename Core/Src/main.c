@@ -29,11 +29,10 @@
 #include "lcd_i2c.h"
 #include "button_exti.h"
 #include "uart_log.h"
-
-#include "actuators_test.h"
-#include "display_test.h"
-#include "input_test.h"
-#include "test_runner.h"
+#include "test_led.h"
+#include "test_buzzer.h"
+#include <string.h> 
+#include "test_lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -116,7 +115,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM4_Init();
   MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
+/* USER CODE BEGIN 2 */
   LED_Init (&g_led, 
             GPIOB, GPIO_PIN_3, //green = PB3
             GPIOB, GPIO_PIN_4, // yellow = PB4

@@ -1,7 +1,9 @@
 #include "test_runner.h"
 #include "main.h"
-#include <string.h>
-
+#include "test_led.h"
+#include "test_buzzer.h"
+#include "test_lcd.h"
+#include "test_uart.h"
 #if ENABLE_HARDWARE_TESTBENCH
 
 extern UART_HandleTypeDef huart1; 

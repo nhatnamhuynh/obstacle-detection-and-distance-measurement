@@ -1,153 +1,151 @@
-```markdown
-# Obstacle Detection and Distance Measurement Using Ultrasonic Sensing and Timer Input Capture on STM32F103[cite: 1]
+# Obstacle Detection and Distance Measurement Using Ultrasonic Sensing and Timer Input Capture on STM32F103
 
-> **Vietnamese Title:** Hệ thống Phát hiện vật cản và Đo khoảng cách Sử dụng Cảm biến Siêu âm và Timer Input Capture trên STM32F103[cite: 1]  
-> **Course:** MLIoT - Embedded C 2026[cite: 1]  
-> **Group:** Group 3 (SHEETS)[cite: 1]  
-
----
-
-## 1. Executive Summary & Problem Statement
-
-Rear blind spots in motor vehicles (especially during reversing maneuvers) and mobile robots pose significant risks of collisions[cite: 1]. Conventional rearview mirrors cannot fully cover all spatial zones, particularly for low-profile or unexpectedly moving obstacles[cite: 1].
-
-This project implements a real-time, high-accuracy smart reversing warning system on the STM32F103 micro-controller[cite: 1]. By leveraging hardware-based time measurement via **Timer Input Capture** instead of software delay loops, the system achieves precise distance calculations while dramatically reducing CPU waiting overhead[cite: 1]. The architecture delivers multi-channel feedback, including multi-color LED indicators, a PWM passive buzzer, an I2C LCD display, and real-time UART data telemetry[cite: 1].
+> **Course Project:** MLIoT - Embedded C (2026)  
+> **Group:** Group 3 (Nhóm 3)  
+> **Target Microcontroller:** STM32F103C8T6 (ARM Cortex-M3)  
 
 ---
 
-## 2. Project Objectives
+## 📌 Executive Summary & Project Context
 
-1. **High-Precision Distance Measurement:** Utilize the HC-SR04 ultrasonic sensor with STM32 Timer Input Capture across a $2\text{ cm} - 400\text{ cm}$ range, maintaining an average relative error below $5\%$[cite: 1].
-2. **Multi-Tiered Alert System:**
-   * **Acoustic (Buzzer):** Modulate beep frequency inversely proportional to obstacle distance, transitioning to a continuous alarm tone when distance $< 20\text{ cm}$[cite: 1].
-   * **Visual (LEDs):** Categorize ranges into 3 distinct zones: Safe Zone (Green LED ON), Warning Zone (Yellow LED ON / slow blink), Danger Zone (Red LED ON / fast blink)[cite: 1].
-3. **Intuitive User Interface:** Drive a $16\times2$ LCD via I2C (PCF8574)[cite: 1]. Line 1 displays real-time distance and unit (supporting $cm \leftrightarrow inch$ toggle via button); Line 2 displays FSM operational states (`Safe`/`Warning`/`Danger`)[cite: 1].
-4. **Data Logging & Telemetry:** Package distance and state telemetry into formatted strings, transmitting via UART to a PC host every $200\text{ ms}$ for real-time monitoring and analysis[cite: 1].
+### Problem Statement
+In mobile robotics and vehicular control—specifically during automotive reversing operations—rear blind spots represent a primary cause of collisions. Traditional mirror-based observation systems fail to cover the entire spatial geometry behind a vehicle, particularly for low-lying obstacles or suddenly appearing hazards.
 
----
+### Practical Need
+This project develops a smart, real-time, high-precision embedded reversing warning system. Beyond raw data acquisition, the system processes spatial metrics and dispatches multi-channel feedback (visual LED indicators, acoustic PWM signals, LCD display metrics, and serial UART telemetry) to enable immediate driver reaction.
 
-## 3. System Scope & Technical Assumptions
-
-### In-Scope
-* **Signal Acquisition:** Generate $10\mu s$ TRIG pulse via GPIO; capture ECHO rising/falling edges using Timer Input Capture[cite: 1].
-* **Digital Filtering:** Implement a 5-sample Moving Average Filter ($N=5$) to suppress transient spikes[cite: 1].
-* **Interrupt & Input Debouncing:** Process unit conversion button presses via EXTI interrupts integrated with a $200\text{ ms}$ software debounce window[cite: 1].
-* **PWM Audio Control:** Drive a passive buzzer via Timer PWM to dynamically adjust beep alert frequency[cite: 1].
-* **Exception Handling:** Detect missing Echo signals ($> 400\text{ cm}$ or timeout) and safely transition to an `Out of Range` state without halting the MCU[cite: 1].
-
-### Out-of-Scope
-* Mechanical actuation, automatic braking systems, or motor drives[cite: 1].
-* Computer vision, camera-based object recognition, or surface material classification[cite: 1].
-* Real-Time Operating Systems (FreeRTOS); the project strictly uses a bare-metal architecture with hardware interrupts[cite: 1].
-
-### System Assumptions
-* Primary testing obstacles are rigid and flat, positioned perpendicular to the acoustic beam axis[cite: 1].
-* Power supply rails ($5\text{V}$ for HC-SR04/LCD and $3.3\text{V}$ for STM32) remain stable without voltage sags during peripheral activation[cite: 1].
+### Academic & Technical Significance
+- **Commercial Hardware Emulation:** Simulates the operational principles of commercial automotive park-assist sensors.
+- **Hardware Time-Stamping:** Utilizes hardware-based Timer Input Capture instead of software delay loops, maximizing distance calculation precision while eliminating CPU waiting cycles.
+- **Bare-metal Mastery:** Demonstrates low-level programming on the STM32F103 micro-architecture, orchestrating synchronized core peripherals including TIM, PWM, I2C, UART, and EXTI interrupt handlers.
 
 ---
 
-## 4. Hardware & Software Specifications
+## 🎯 Project Objectives
 
-### Bill of Materials (BOM)
+1. **High-Precision Distance Measurement:** Maximize the capability of the HC-SR04 ultrasonic sensor paired with STM32 Timer Input Capture over a range of $2\text{ cm}$ to $400\text{ cm}$, targeting an average relative error below $5\%$.
+2. **Multi-Level Hazard Alerting:**
+   - **Acoustic (Buzzer):** Modulate passive buzzer beep frequency inversely proportional to obstacle distance. Kicks into a continuous alarm when distance drops below $20\text{ cm}$.
+   - **Visual (LEDs):** Categorize spatial risk into 3 distinct zones:
+     - **Safe Zone:** Solid Green LED
+     - **Warning Zone:** Solid / Slow Blinking Yellow LED
+     - **Danger Zone:** Solid / Fast Blinking Red LED
+3. **Visual User Interface:** Drive a 16x2 LCD via an I2C I/O expander (PCF8574). Line 1 displays real-time distance and active units (supporting $cm \leftrightarrow inch$ toggling via a push-button). Line 2 displays the system FSM state (`Safe` / `Warning` / `Danger` / `Out of Range`).
+4. **Telemetry & Data Acquisition:** Package spatial and state data into standardized telemetry strings transmitted via UART to a host PC every $200\text{ ms}$ for real-time monitoring, plotting, and log analysis.
 
-| Component Category | Hardware / Tool Name | Quantity / Details |
+---
+
+## 🛠️ System Architecture & Specifications
+
+### System Scope
+
+| System WILL DO | System WILL NOT DO |
+| :--- | :--- |
+| Generate $10\mu s$ TRIG pulses via GPIO and capture Echo pulse edges using Timer Input Capture. | Integrate mechanical actuators or interface with vehicle automatic braking/throttle systems. |
+| Apply a Moving Average Filter ($N=5$) to smooth spatial metrics and reject impulsive noise spikes. | Perform image recognition or classify obstacle geometries/materials automatically. |
+| Execute hardware EXTI interrupts with $200\text{ ms}$ software lock-out debounce for unit switching. | Utilize a Real-Time Operating System (FreeRTOS); system relies strictly on Bare-metal + Interrupt architecture. |
+| Monitor ultrasonic Echo response timeout to issue "Out of Range" states without freezing the CPU. | |
+
+### Test Environment Assumptions
+- **Reference Target:** Perpendicular, hard flat surface used as the primary benchmark to optimize acoustic reflection.
+- **Power Supply Integrity:** Regulated $5\text{V}$ (HC-SR04, LCD) and $3.3\text{V}$ (STM32) power rails operating without voltage sag during peripheral activation.
+
+---
+
+## 🔬 Hardware Component Bill of Materials (BOM)
+
+| Component Category | Part / Module Name | Description / Specifications |
 | :--- | :--- | :--- |
-| **Microcontroller Board** | STM32F103C8T6 (Blue Pill)[cite: 1] | 1x Board + ST-Link V2 Debugger[cite: 1] |
-| **Primary Sensor** | HC-SR04 Ultrasonic Sensor[cite: 1] | 1x Module ($2\text{ cm} - 400\text{ cm}$ range)[cite: 1] |
-| **Display Module** | LCD 16x2 + PCF8574 I2C Adapter[cite: 1] | 1x Display Assembly[cite: 1] |
-| **Audio & Visual** | Passive Buzzer, LEDs (Green, Yellow, Red)[cite: 1] | 1x Buzzer, 3x LEDs, 220$\Omega$ Resistors[cite: 1] |
-| **User Input & Serial** | Tactile Push Button, CP2102 USB-UART Converter[cite: 1]| 1x Button (10k$\Omega$ pull-up), 1x Serial Module[cite: 1] |
-| **Toolchain & Software** | VS Code, STM32CubeMX, Arm GNU Toolchain[cite: 1] | CMake, Ninja, STM32 Programmer CLI, Draw.io[cite: 1] |
-| **Software Libraries** | STM32 HAL Library, Standard C Libraries[cite: 1] | Embedded C Bare-Metal Execution[cite: 1] |
+| **Microcontroller Board** | STM32F103C8T6 (Blue Pill) | ARM Cortex-M3 core @ $72\text{ MHz}$ |
+| **Programmer / Debugger** | ST-Link V2 | SWD programming & debugging interface |
+| **Primary Sensor** | HC-SR04 Ultrasonic Module | $2\text{ cm} - 400\text{ cm}$ range, $40\text{ kHz}$ acoustic frequency |
+| **Display Interface** | 16x2 Character LCD + PCF8574 | I2C communication interface module |
+| **Acoustic Actuator** | Passive Piezoelectric Buzzer | Driven via Timer PWM |
+| **Visual Indicators** | 3x LEDs (Green, Yellow, Red) | Driven via GPIO with $220\Omega$ current-limiting resistors |
+| **User Input** | 1x Tactile Push-Button | Unit conversion ($cm/inch$), $10\text{k}\Omega$ pull-up resistor |
+| **Serial Telemetry** | CP2102 USB-to-UART Module | Transmitting logs to Serial Terminal on PC |
+| **Software Toolchain** | VS Code, STM32CubeMX, Arm GNU Toolchain, CMake, Ninja, STM32 Programmer CLI |
 
 ---
 
-## 5. Architectural Design & Signal Processing
+## ⚙️ Peripherals & Signal Processing Logic
 
-### 1. Distance Calculation Formula
-The STM32 pulls the TRIG pin HIGH for $10\mu s$[cite: 1]. The HC-SR04 emits an ultrasonic burst and pulls the ECHO pin HIGH until the reflected wave is received[cite: 1]. Timer Input Capture records timestamps $T_1$ (rising edge) and $T_2$ (falling edge)[cite: 1]:
-$$\Delta T = T_2 - T_1 \quad (\mu s)[cite: 1]$$
-$$\text{Distance } S = \frac{v \cdot \Delta T}{2} = \frac{0.0343 \cdot \Delta T}{2} \quad (\text{cm})[cite: 1]$$
+### 1. Distance Calculation & Time-Stamping
+1. STM32 issues a $10\mu s$ HIGH trigger pulse on the HC-SR04 TRIG pin.
+2. HC-SR04 emits an $8$-cycle $40\text{ kHz}$ ultrasound burst and drives the ECHO pin HIGH.
+3. Timer 2 (TIM2 Input Capture) captures rising edge time $T_1$ and falling edge time $T_2$.
+4. Pulse width duration: $\Delta t = T_2 - T_1$.
+5. Distance equation ($v = 0.0343\text{ cm}/\mu s$):
+$$S = \frac{v \times \Delta t}{2}$$
 
-### 2. Button Debounce Algorithm
-When an EXTI interrupt fires on the push button, the system compares the current SysTick timestamp against the last valid press timestamp ($T_{last}$)[cite: 1]:
-$$\Delta t = T_{current} - T_{last}[cite: 1]$$
-* If $\Delta t \ge 200\text{ ms}$: Accept keypress, update unit ($cm \leftrightarrow inch$), and set $T_{last} = T_{current}$[cite: 1].
-* If $\Delta t < 200\text{ ms}$: Reject keypress as mechanical contact bounce[cite: 1].
-
-### 3. Finite State Machine (FSM) Logic
-
-
-```
-
-[Distance S / Timeout Exception]
-│
-├───► (S >= 400cm OR Echo Timeout) ──► [STATE_OUT_OF_RANGE]
-│                                     ├─ LEDs: OFF
-│                                     └─ Buzzer: Silent
-│
-├───► (S >= 50cm) ──────────────────► [STATE_SAFE]
-│                                     ├─ LED: Green ON
-│                                     └─ Buzzer: Silent
-│
-├───► (20cm <= S < 50cm) ───────────► [STATE_WARNING]
-│                                     ├─ LED: Yellow Slow Blink
-│                                     └─ Buzzer: Slow Beep
-│
-└───► (S < 20cm) ───────────────────► [STATE_DANGER]
-├─ LED: Red Fast Blink
-└─ Buzzer: Continuous Tone
-
-```
-
-* **State 1 — Safe State ($S \ge 50\text{ cm}$):** Green LED ON, Buzzer completely silent[cite: 1].
-* **State 2 — Warning State ($20\text{ cm} \le S < 50\text{ cm}$):** Yellow LED ON (slow blinking), Buzzer emits slow beeps[cite: 1].
-* **State 3 — Danger State ($S < 20\text{ cm}$):** Red LED ON (fast blinking), Buzzer emits rapid continuous alarm[cite: 1].
-* **State 4 — Out of Range ($S \ge 400\text{ cm}$ or Echo Timeout):** All 3 LEDs OFF, Buzzer completely silent[cite: 1].
+### 2. Digital Filtering & Debouncing
+- **Moving Average Filter:** Replaces raw distance values with the arithmetic mean of the last $N=5$ consecutive samples to smooth sensor drift:
+$$\bar{S}_k = \frac{1}{5} \sum_{i=0}^{4} S_{k-i}$$
+- **Software Debounce (EXTI):** When the button EXTI interrupt fires, `HAL_GetTick()` checks elapsed time against `last_valid_time`. If $\Delta t \ge 200\text{ ms}$, the unit toggles; otherwise, the event is rejected as mechanical contact chatter.
 
 ---
 
-## 6. Test Suite & Verification Matrix
+## 🔄 Finite State Machine (FSM) Specification
 
-| Test ID | Test Category | Execution Procedure | Expected Result |
+The system operates across 4 distinct operational states based on filtered distance metric $S$:
+[didn't update the FSM picture yet]
+| State Name | Distance Condition ($S$) | Visual Response (LEDs) | Acoustic Response (Buzzer) | LCD / UART Telemetry |
+| :--- | :--- | :--- | :--- | :--- |
+| `STATE_SAFE` | $S \ge 50\text{ cm}$ | Green LED ON | Silent | `Dist: XX.X cm \| SAFE` |
+| `STATE_WARNING` | $20\text{ cm} \le S < 50\text{ cm}$ | Yellow LED ON (Slow Blink $500\text{ ms}$) | Slow Beep ($500\text{ ms}$ period) | `Dist: XX.X cm \| WARNING` |
+| `STATE_DANGER` | $S < 20\text{ cm}$ | Red LED ON (Fast Blink $100\text{ ms}$) | Continuous / Rapid Beep ($100\text{ ms}$) | `Dist: XX.X cm \| DANGER` |
+| `STATE_OUT_OF_RANGE` | $S \ge 400\text{ cm}$ or Echo Timeout | ALL LEDs OFF | Silent | `Out of Range` |
+
+---
+
+## 🧪 Test Cases & Verification Suite
+
+| Test ID | Test Module | Test Procedure & Description | Expected Acceptance Result |
 | :---: | :--- | :--- | :--- |
-| **TC1**[cite: 1] | Independent Peripheral Test[cite: 1] | Verify 3-LED blink, Buzzer activation, I2C LCD printing, and UART text output[cite: 1]. | All hardware peripherals respond without solder defects or assembly errors[cite: 1]. |
-| **TC2**[cite: 1] | HC-SR04 Input Capture[cite: 1] | Send $10\mu s$ TRIG pulse; capture ECHO edges via Timer IC; print pulse duration over UART[cite: 1]. | Timer captures edge timestamps accurately; calculated distance matches physical tape measure[cite: 1]. |
-| **TC3**[cite: 1] | Integration & FSM Alarm[cite: 1] | Sweep target continuously from $100\text{ cm} \rightarrow 2\text{ cm}$; observe LEDs, Buzzer rate, and LCD[cite: 1]. | Buzzer beep frequency increases seamlessly; LEDs transition correctly per FSM rules[cite: 1]. |
-| **TC4**[cite: 1] | Button & Debounce[cite: 1] | Press unit conversion button rapidly; verify $cm \leftrightarrow inch$ toggle response[cite: 1]. | Instant unit switching on LCD/UART without double-triggering or contact bouncing[cite: 1]. |
-| **TC5**[cite: 1] | Out-of-Range Exception[cite: 1] | Point sensor toward open space or target $> 400\text{ cm}$[cite: 1]. | LCD shows `Out of Range`; system returns to Safe state smoothly without MCU crash[cite: 1]. |
-| **TC6**[cite: 1] | Target Geometry Effect[cite: 1] | Measure flat, curved, irregular, hollow box, and mesh targets at a fixed $50\text{ cm}$ mark[cite: 1]. | Quantify measurement errors caused by acoustic scattering and cavity reflection[cite: 1]. |
-| **TC7**[cite: 1] | Field of View (FOV)[cite: 1] | Offset target vertically/horizontally from sensor central axis at $30\text{ cm}$ until signal lost[cite: 1]. | Determine sensor effective angular coverage and blind-zone boundaries[cite: 1]. |
-| **TC8**[cite: 1] | Reflection Angle Limit[cite: 1] | Tilt flat target at $0^\circ, 15^\circ, 30^\circ, 45^\circ, 60^\circ$ relative to beam normal at $20\text{ cm}$[cite: 1]. | Determine critical reflection angle limits where acoustic echo misses the receiver[cite: 1]. |
-| **TC9**[cite: 1] | Target Material Effect[cite: 1] | Test metal, hard plastic, cardboard, cloth, and acoustic foam targets at $20\text{ cm}$[cite: 1]. | Identify optimal reflective materials vs. sound-absorbing materials that attenuate Echo pulses[cite: 1]. |
+| **TC1** | Peripheral Test | Execute independent test scripts for LED blinking, Buzzer PWM, LCD string rendering, and UART transmission. | All hardware components respond correctly; no soldering or open-circuit faults. |
+| **TC2** | Input Capture Test | Trigger HC-SR04 with $10\mu s$ pulse, capture ECHO edge timestamps via TIM2 IC, output calculated $t$ via UART. | Timer captures edges accurately; calculated distance matches physical ruler within tolerance. |
+| **TC3** | Integration & Alarm | Continuously move an obstacle from $100\text{ cm} \rightarrow 2\text{ cm}$. Observe LED, Buzzer, and LCD state transitions. | Buzzer beep frequency accelerates; continuous tone at $<20\text{ cm}$; smooth FSM transition. |
+| **TC4** | Button Debounce | Press unit button rapidly and repeatedly to test $cm \leftrightarrow inch$ conversion stability. | Immediate unit conversion on LCD; zero multi-triggering or mechanical contact bounce errors. |
+| **TC5** | Out of Range Test | Point sensor at open space ($>400\text{ cm}$) to trigger Echo reception timeout. | LCD shows `Out of Range`; system reverts to `Safe` state gracefully without CPU deadlock. |
+| **TC6** | Surface Geometry | Test flat, curved, angular, dented, hollow box, and mesh surfaces at a fixed $50\text{ cm}$ mox. | Quantify reflection attenuation; flat surfaces yield optimal accuracy; mesh/hollow surfaces cause high error. |
+| **TC7** | Field of View (FoV) | Move obstacle vertically and horizontally off-axis at $30\text{ cm}$ to map sensor blind zones. | Define empirical beam angle boundary (maximum deviation angle for reliable detection). |
+| **TC8** | Reflection Angle | Rotate flat target at angles of $0^\circ, 15^\circ, 30^\circ, 45^\circ, 60^\circ$ relative to the acoustic beam axis at $20\text{ cm}$. | Map relationship between inclination angle and measurement error; identify signal loss threshold. |
+| **TC9** | Material Impact | Measure identical size targets made of metal, hard plastic, cardboard, fabric, and acoustic foam at $20\text{ cm}$. | High-density materials give strong Echo response; sound-absorbing foam causes signal extinction. |
+
+### System Acceptance Criteria (Demo Requirements)
+1. **Measurement Accuracy:** Average relative error $\le 5\%$ across calibrated distances; non-blocking recovery from `OUT_OF_RANGE` timeouts.
+2. **State & Display Responsiveness:** Accurate state transitions at $20\text{ cm}$, $50\text{ cm}$, and $400\text{ cm}$; LCD & UART refresh rate $\le 200\text{ ms}$.
+3. **User Interaction:** Instantaneous unit conversion without switch bounce; no system crash under continuous serial stream.
+4. **Long-Run Stability:** Continuous $15 - 30$ minute continuous run test with serial logging showing zero stack overflow or timer interrupt locks.
 
 ---
 
-## 7. Acceptance & Demonstration Criteria
+## ⚡ Risk Management & Technical Mitigation
 
-* **Measurement Accuracy:** Average relative error $\le 5\%$ across valid measurement points[cite: 1]. Reliable capture of `OUT OF RANGE` states without system lockup[cite: 1].
-* **FSM & Display Stability:** Accurate state rendering (`SAFE`, `WARNING`, `DANGER`) with smooth transitions at boundaries ($20\text{ cm}, 50\text{ cm}, 400\text{ cm}$)[cite: 1]. Refresh rates for LCD and UART updated every $200\text{ ms}$[cite: 1].
-* **User Interaction:** Instantaneous unit conversion without switch bounce glitches[cite: 1]. Data stream over UART remains clean and uncorrupted[cite: 1].
-* **Repository Quality:** Complete GitHub repository containing clean source code, complete `README.md`, and verifiable empirical test data[cite: 1].
-
----
-
-## 8. Team Structure & Task Allocation
-
-| Member Name | Student ID | Role | Key Deliverables & Responsibilities |
-| :--- | :---: | :--- | :--- |
-| **Huỳnh Nhật Nam**[cite: 1] | **25112341**[cite: 1] | Team Leader[cite: 1] | Display & UART Communication Drivers, Input/Actuator Test Code, System Architecture[cite: 1]. |
-| **Phạm Minh Huy**[cite: 1] | **2500292**[cite: 1] | Core Firmware[cite: 1] | CubeMX Init & Project Boilerplate, Input/Actuator Drivers, Display/Comm Test Code[cite: 1]. |
-| **Thân Đức Phát**[cite: 1] | **2551627**[cite: 1] | Hardware & Testing[cite: 1] | PCB Layout Design, Hardware Prototype Assembly, Component Test Code, Soldering[cite: 1]. |
+| Risk / Failure Mode | Technical Cause | Mitigation Strategy |
+| :--- | :--- | :--- |
+| **HC-SR04 Echo Noise** | Spurious acoustic reflections in ambient space. | Increase moving average filter sample depth ($N>5$). |
+| **Interrupt Priority Conflicts** | High UART/EXTI load blocking Timer Input Capture. | Configure strict NVIC priority hierarchy: `TIM2_IC` (Highest) $\rightarrow$ `SysTick` $\rightarrow$ `UART1` $\rightarrow$ `EXTI` (Lowest). |
+| **Timer Counter Overflow** | Missing Echo pulse in open space causing infinite waiting. | Set maximum counter timeout limit corresponding to $400\text{ cm}$; force `STATE_OUT_OF_RANGE`. |
+| **Power Rail Voltage Drop** | Inrush current when activating PWM Buzzer and LEDs simultaneously. | Isolate power rails using dedicated low-dropout regulators ($5\text{V}$ and $3.3\text{V}$). |
+| **Acoustic Extinction** | Soft absorption materials or extreme angles scattering sound waves. | Document physical sensor boundary limits; implement software timeout safety fallbacks. |
 
 ---
 
-## 9. References & Datasheets
+## 👥 Team Members & Task Distribution
 
-* **STM32F103x Reference Manual & Datasheet** — STMicroelectronics[cite: 1]
-* **HC-SR04 Ultrasonic Sensor Datasheet** — SparkFun / Elecfreaks[cite: 1]
-* **HD44780 LCD Controller & PCF8574 I2C Backpack Datasheets** — Texas Instruments / Hitachi[cite: 1]
-* **CP2102 USB-to-UART Bridge Controller Datasheet** — Silicon Labs[cite: 1]
-* **ST Community & Controllers Tech Tutorials** — STM32 HAL & Input Capture Guides[cite: 1]
+| Member Name | Student ID | Primary Responsibilities & Deliverables |
+| :--- | :---: | :--- |
+| **Huỳnh Nhật Nam** *(Leader)* | 25112341 | Firmware development for Display & Communication modules; Input & Actuator unit testing; documentation. |
+| **Phạm Minh Huy** | 2500292 | STM32CubeMX initialization & code skeleton; Input & Actuator module implementation; Display test routines. |
+| **Thân Đức Phát** | 2551627 | PCB schematic & board layout in Altium; prototype breadboard assembly; hardware peripheral unit test code. |
 
-```
+---
+
+## 📚 References & Technical Datasheets
+
+1. **STMicroelectronics:** *STM32F103x8/B Datasheet & RM0008 Reference Manual*.
+2. **Sensors & Actuators:** *HC-SR04 Ultrasonic Sensor User Manual*.
+3. **Display & Drivers:** *HD44780 LCD Controller Datasheet* & *PCF8574 Remote 8-Bit I/O Expander Datasheet*.
+4. **Communication:** *Silicon Labs CP2102 USB-to-UART Bridge Chipset Datasheet*.
+5. **Prior Art & Code Repositories:** ST Community Examples, Controllers Tech STM32 Hardware Tutorials, Embedded C Coursework Repository (Vũ Phúc Thịnh capstone project).

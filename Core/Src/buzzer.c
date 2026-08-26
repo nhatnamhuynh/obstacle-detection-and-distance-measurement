@@ -7,8 +7,12 @@ static void Buzzer_WriteHardware (Buzzer_t *buzzer, uint8_t state){ // to turn o
 
     buzzer->is_active = state;
     if (state) {
+        __HAL_TIM_SET_COMPARE(buzzer->htim, buzzer->channel, 500);
         HAL_TIM_PWM_Start (buzzer->htim, buzzer->channel);
-    } else HAL_TIM_PWM_Stop (buzzer->htim, buzzer->channel);
+    } else {
+        __HAL_TIM_SET_COMPARE(buzzer->htim, buzzer->channel, 0);
+        HAL_TIM_PWM_Stop (buzzer->htim, buzzer->channel);
+    }
 }
 
 void Buzzer_Init(Buzzer_t *buzzer, TIM_HandleTypeDef *htim, uint32_t channel) {
@@ -23,23 +27,26 @@ void Buzzer_Init(Buzzer_t *buzzer, TIM_HandleTypeDef *htim, uint32_t channel) {
 
 void Buzzer_Update(Buzzer_t *buzzer, SystemState_t state) {
     if (buzzer == NULL) return;
-    if (current_state == state) return;
-    current_state = state;
-
-    uint32_t current_time = HAL_GetTick();
+        uint32_t current_time = HAL_GetTick();
+    if (current_state != state) {
+        current_state = state;
+        buzzer->last_toggle_time = current_time;
+    }
 
     switch (state) {
-        case STATE_OUT_OF_RANGE: break; // do nothing
-        case STATE_SAFE: break;
+        case STATE_OUT_OF_RANGE:
+            Buzzer_WriteHardware (buzzer, 0);
+            break; // do nothing
+        case STATE_SAFE: 
+            Buzzer_WriteHardware (buzzer, 0);
+            break;
         case STATE_WARNING:
-            Buzzer_WriteHardware (buzzer, !buzzer->is_active);
             if (current_time - buzzer->last_toggle_time >= 500) {
                 Buzzer_WriteHardware (buzzer, !buzzer->is_active);
                 buzzer->last_toggle_time = current_time;
             }
             break;
         case STATE_DANGER:
-            Buzzer_WriteHardware (buzzer, !buzzer->is_active);
             if (current_time - buzzer->last_toggle_time >= 100){
                 Buzzer_WriteHardware (buzzer, !buzzer->is_active);
                 buzzer->last_toggle_time = current_time;

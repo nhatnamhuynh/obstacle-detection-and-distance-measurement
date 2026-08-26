@@ -111,7 +111,11 @@ void LCD_DisplaySensorData(const SensorData_t *sensor_data) {
                 break;
         }
 
-        snprintf(line1, sizeof(line1), "Dist: %-6.1f %-2s", sensor_data->filtered_distance, unit_str);
+        if(sensor_data->state == STATE_OUT_OF_RANGE) {
+            snprintf(line1, sizeof(line1), "Dist:  --- %-4s", unit_str);
+        } else {
+            snprintf(line1, sizeof(line1), "Dist: %-6.1f %-3s", sensor_data->filtered_distance, unit_str);
+        }
         snprintf(line2, sizeof(line2), "%-12s", state_str);
 
         LCD_SetCursor(0, 0);

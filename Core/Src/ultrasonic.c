@@ -5,7 +5,9 @@ static volatile uint32_t echo_time_us = 0; // time for the echo pulse width
 static volatile uint32_t is_first_captured = 0; // 0 = waiting for rising edge, 1 = waiting for falling edge
 static volatile uint32_t posedge_time = 0; // time of the rising edge
 static volatile uint32_t negedge_time = 0; // time of the falling edge
-static volatile uint32_t last_time_scan = 0; // last time the sensor was scanned
+static volatile uint32_t last_time_trigger = 0; // last time the sensor was scanned
+static volatile uint32_t last_time_capture = 0; // last time the sensor was scanned
+
 
 
 static void delay_us(uint32_t us) {                         // approximate delay
@@ -13,13 +15,6 @@ static void delay_us(uint32_t us) {                         // approximate delay
     while (count--) {
         __NOP();
     }
-}
-static bool wait50ms(void) {
-  if (HAL_GetTick() - last_time_scan >= 50) {
-    last_time_scan = HAL_GetTick();
-    return 1;
-  }
-  return 0;
 }
 
 void Ultrasonic_Init(void) {
@@ -33,7 +28,13 @@ void Ultrasonic_Init(void) {
 }
 
 bool Ultrasonic_Trigger(void) {
-    if (wait50ms()) {
+    if (HAL_GetTick() - last_time_trigger >= 50) { // trigger every 50ms
+
+        if (is_first_captured == 1) { 
+            echo_time_us = 24000;
+        }
+
+        last_time_trigger = HAL_GetTick();
         is_first_captured = 0;
         __HAL_TIM_SET_CAPTUREPOLARITY(&htim2, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING); // wait for rising edge
 
@@ -52,8 +53,7 @@ float Ultrasonic_ReadDistance(void) {
     }
 
     float distance = ((float)echo_time_us * 0.0343f) / 2.0f; // s = v.t
-
-    if (distance > 400.0f) return -1.0f; // out of range
+    
     return distance;
 }
 
@@ -63,8 +63,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
             posedge_time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
             is_first_captured = 1; // next capture will be falling edge
 
-            __HAL_TIM_SET_CAPTUREPOLARITY (htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING); // wait for falling edge
 
+            __HAL_TIM_SET_CAPTUREPOLARITY (htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING); // wait for falling edge
         } else {
             negedge_time = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 

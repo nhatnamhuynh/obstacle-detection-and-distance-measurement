@@ -54,7 +54,9 @@ dkms.conf
 # debug information files
 *.dwo
 
-# CMake Build Outputs & Caches
+# ==========================================
+# CMake Build Outputs & Caches (Đã tối ưu)
+# ==========================================
 build/
 Build/
 cmake-build-*/
@@ -62,6 +64,33 @@ CMakeCache.txt
 CMakeFiles/
 CMakeMain.txt
 cmake_install.cmake
-Makefile
-*.cmake
-!CMakeLists.txt
+
+# Chỉ ignore Makefile/cmake trong thư mục build, giữ lại Makefile/cmake ở root
+/Makefile
+/build*/*.cmake
+
+# ==========================================
+# STM32 IDEs & Editors Junk Files
+# ==========================================
+# STM32CubeIDE / Eclipse
+.settings/
+.launch
+*.launch
+Debug/
+Release/
+
+# Keil MDK-ARM / IAR
+*.uvgui.*
+*.uvoptx
+*.dep
+*.htm
+*.build_log.htm
+Listings/
+Objects/
+settings/
+
+# VS Code / CLion / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

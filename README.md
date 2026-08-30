@@ -1,3 +1,47 @@
+## Hardware Implementation
+## 3. Hardware
+
+### 3.1. Overview
+Dưới đây là danh sách chi tiết các linh kiện phần cứng (BOM) được sử dụng để xây dựng hệ thống:
+
+| Component Category | Part / Module Name | Description / Specifications |
+| :--- | :--- | :--- |
+| **Microcontroller Board** | STM32F103C8T6 (Blue Pill)[cite: 1, 2] | ARM Cortex-M3 core @ 72 MHz |
+| **Programmer / Debugger** | ST-Link V2[cite: 1, 2] | SWD programming & debugging interface |
+| **Primary Sensor** | HC-SR04 Ultrasonic Module[cite: 1, 2] | 2 cm – 400 cm range[cite: 1, 2], 40 kHz acoustic frequency |
+| **Display Interface** | 16x2 Character LCD + PCF8574[cite: 1, 2] | I2C communication interface module |
+| **Acoustic Actuator** | Passive Piezoelectric Buzzer[cite: 1, 2] | Driven via Timer PWM |
+| **Visual Indicators** | 3x LEDs (Green, Yellow, Red)[cite: 1, 2] | Driven via GPIO with 220Ω current-limiting resistors[cite: 1] |
+| **User Input** | 1x Tactile Push-Button[cite: 1, 2] | Unit conversion (cm / inch)[cite: 1, 2], 10kΩ pull-up resistor[cite: 1] |
+| **Serial Telemetry** | CP2102 USB-to-UART Module[cite: 1, 2] | Transmitting logs to Serial Terminal on PC |
+| **Software Toolchain** | VS Code, STM32CubeMX, Arm GNU Toolchain, CMake, Ninja, STM32 Programmer CLI[cite: 1] | Các công cụ phần mềm phục vụ lập trình và biên dịch |
+
+*Lưu ý:* Hệ thống sử dụng mạch nguồn hạ áp độc lập để cấp điện áp 5V (cho cảm biến, màn hình LCD) và điện áp 3.3V ổn định cho vi điều khiển STM32 trong suốt quá trình vận hành, chống sụt áp khi ngoại vi kích hoạt[cite: 1, 2].
+
+### 3.2. Pinout Schematic
+Các ngoại vi được kết nối với vi điều khiển STM32 thông qua cấu hình chân trên STM32CubeMX như sau:
+
+| Ngoại vi (Peripheral) | Chân vi điều khiển | Chức năng (Function) |
+| :--- | :--- | :--- |
+| **HC-SR04 (Trig)** | `PA1` | GPIO Output |
+| **HC-SR04 (Echo)** | `PA0` | Timer Input Capture |
+| **Nút nhấn (Button)** | `PA2` | Ngắt ngoài EXTI (Đổi đơn vị đo)     |
+| **LED Xanh (Safe)** | `PB3` | GPIO Output |
+| **LED Vàng (Warning)** | `PB4` | GPIO Output |
+| **LED Đỏ (Danger)** | `PB5` | GPIO Output |
+| **Buzzer** | `PB8` | Timer PWM (Điều khiển tần suất bíp) |
+| **LCD 16x2 (SCL)** | `PB6` | I2C SCL |
+| **LCD 16x2 (SDA)** | `PB7` | I2C SDA |
+| **UART (TX)** | `PA9` | UART TX - Truyền dữ liệu log lên Terminal|
+| **UART (RX)** | `PA10` | UART RX - Nhận dữ liệu|
+
+### 3.3. PCB Layout
+* **Công cụ thiết kế:** Mạch PCB của dự án được thiết kế chuyên nghiệp bằng phần mềm **Altium Designer**.
+* **Bố trí linh kiện (Layout):** Mạch được phân bổ hợp lý thành các khu vực gồm: Header cho vi điều khiển Blue Pill, chân cắm module UART, cảm biến HC-SR04, màn hình LCD, khu vực cho nút nhấn, còi buzzer và cụm 3 domino để xuất tín hiệu cho đèn LED cảnh báo.
+
+![Front PCB Layout](Picture/[MLIoT%20Project]%20Front%20PCB.png)
+![Back PCB Layout](Picture/[MLIoT%20Project]%20Back%20PCB.png)
+
 ## Software Implementation
 
 ### 1. Overview: Development Tools and Libraries

@@ -186,8 +186,8 @@ Place the obstacle at different positions not on the direct axis from the sensor
 
 ### Future Developments
 
-* **Hardware Optimization:** Implement external power management featuring buck converter circuits to guarantee a stable 3.3V / 5V rail voltage under peak peripheral loads. Explore higher-precision distance sensors to improve overall ranging accuracy.
-* **Software Architecture:** Refine the Nested Vectored Interrupt Controller (NVIC) priority hierarchy to eliminate interrupt preemption conflicts:  
+* **Hardware Optimization:** Implement external power management using buck converter circuits to guarantee a stable 3.3V / 5V voltage under peak peripheral loads. Explore higher-precision sensors to improve overall accuracy.
+* **Software Architecture:** Refine the Nested Vectored Interrupt Controller (NVIC) priority to eliminate interrupt preemption conflicts:  
   `Timer Input Capture` $\rightarrow$ `SysTick / UART` $\rightarrow$ `EXTI (Button)`
 
 ## Authors:

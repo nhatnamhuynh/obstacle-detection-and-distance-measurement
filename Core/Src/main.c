@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "ultrasonic.h"
 #include "moving_filter.h"
+#include "median_filter.h"
 #include "buzzer.h"
 #include "led.h"
 #include "fsm_alarm.h"
@@ -150,11 +151,12 @@ int main(void)
     //Interrupt for checking the sensor every 50ms
     if (Ultrasonic_Trigger()) {
       float raw_cm = Ultrasonic_ReadDistance();
-      float filtered_cm = MovingFilter_Update(&g_filter, raw_cm);
+      float filtered_cm = raw_cm;
+      // if want to test one filter, comment the other one's line
+      filtered_cm = MedianFilter_Update(filtered_cm); // median filter first
+      filtered_cm = MovingFilter_Update(&g_filter, filtered_cm);
 
       FSM_Update(filtered_cm, &g_data); // Update the FSM state and filtered distance
-
-      // add more functions that send data to the lcd screen
     }
 
 

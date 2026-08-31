@@ -179,16 +179,15 @@ Place the obstacle at different positions not on the direct axis from the sensor
 ## Limitations and Future Developments
 ### Limitations
 
-* **Sensor Physical Constraints:** The HC-SR04 may encounter echo noise issues, making it difficult to detect sound-absorbing materials (e.g., foam, mesh) or inclined surfaces beyond its angular threshold.
-* **Concurrency & Resource Management:** Interrupt handling may lead to resource conflicts when scaling to a multi-sensor setup. Simultaneous activation of all peripherals can also cause significant supply voltage drops.
+* The HC-SR04 may encounter echo noises, making it difficult to detect sound-obsorbing materials or inclined surfaces.
+* The interrupts may lead to conflicts when scaling this system to a larger one, with multiple sensors. It can also cause extreme power drop when all peripherals are active at the same time.
 
 ---
 
-### Future Developments
+### Future developments
 
-* **Hardware Optimization:** Implement external power management using buck converter circuits to guarantee a stable 3.3V / 5V voltage under peak peripheral loads. Explore higher-precision sensors to improve overall accuracy.
-* **Software Architecture:** Refine the Nested Vectored Interrupt Controller (NVIC) priority to eliminate interrupt preemption conflicts:  
-  `Timer Input Capture` $\rightarrow$ `SysTick / UART` $\rightarrow$ `EXTI (Button)`
+* **Hardware:** supply external power with bucking circuits to ensure stable 3.3V/5V voltage (depending on each component) during operation; consider other sensors for more precise distance calculations.
+* **Software:** tightly configure the Nested Vectored Interrupt Controller (NVIC) to avoid conflicts: Timer Input Capture $\rightarrow$ Systick/U-ART $\rightarrow$ EXTI (Button)
 
 ## Authors:
 * Huynh Nhat Nam

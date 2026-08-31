@@ -187,7 +187,7 @@ Place the obstacle at different positions not on the direct axis from the sensor
 ### Future developments
 
 * **Hardware:** supply external power with bucking circuits to ensure stable 3.3V/5V voltage (depending on each component) during operation; consider other sensors for more precise distance calculations.
-* **Software:** tightly configure the Nested Vectored Interrupt Controller (NVIC) to avoid conflicts: Timer Input Capture $\rightarrow$ Systick/U-ART $\rightarrow$ EXTI (Button)
+* **Software:** tightly configure the Nested Vectored Interrupt Controller (NVIC) to avoid conflicts: `Timer Input Capture` $\rightarrow$ `SysTick / UART` $\rightarrow$ `EXTI (Button)`
 
 ## Authors:
 * Huynh Nhat Nam

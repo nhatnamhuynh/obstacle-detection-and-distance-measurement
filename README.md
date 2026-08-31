@@ -1,12 +1,14 @@
 ## Project Overview
 This project implements STM32 into an obstacle warning system for vehicles. It triggers the ultrasonic waves, detects obstacles and calculates how far the objects are using the reflected ECHO signal. Based on real-time distance, it warns the user through multiple channels, including LEDs, buzzer, and LCD display. The system also transmits data logs periodically to the server using the U-ART interface, reporting realistic operation data for testing and future developments.
-## Learning Objectived
+
+## Learning Objectives
 * Practice embedded C programming on STM32 with HAL library.
 * Understanding and applying Timers, Input Capture, Interrupts, I2C, U-ART, PWM, GPIO into a practical project.
 * Design a finite state machine for distance-based warning states.
 * Implement a non-blocking main loop using time-driven events.
 * Apply logical framework into utilizing the overall system and deliver cutting-edge test cases. 
 * Enhance documentation and project presentation.
+
 ## Hardware Implementation
 ## 3. Hardware
 
@@ -107,3 +109,69 @@ To maintain real-time performance without an RTOS, the system relies heavily on 
     *   If the difference is $< 200$ ms, it is treated as mechanical noise and the event is ignored.
 <!-- *   **NVIC Priority Configuration:** The Nested Vectored Interrupt Controller (NVIC) is structured with Timer IC having the highest priority, followed by SysTick, then UART, and finally the EXTI Button with the lowest priority. -->
 *   **Timeout & Exception Handling:** Any distance metric exceeding $400\text{ cm}$ automatically transitions the system into the `OUT_OF_RANGE` state. Furthermore, if a new $50\text{ ms}$ trigger cycle begins while the previous Echo measurement is still incomplete (`is_first_captured == 1`), the system detects a missing falling edge and automatically overrides `echo_time_us` to $24,000\ \mu\text{s}$ ($\approx 411.6\text{ cm}$). This forces an immediate `OUT_OF_RANGE` state, resetting the Input Capture state machine and preventing timer corruption.
+
+## Final Product
+The demo video demonstating how the system operates and delivers warning signal through LEDs, Buzzer, LCD Display, and U-ART log:
+▶️ [Obstacle Detection and Distance Measurement](https://youtu.be/Erm0Eq_RM2c?si=jHDenFR6_XJYcfAd)
+
+## Performance Analysis
+The testing is carried out under 3 stages:
+* Level 1 - Components test: ensuring each component performs its function properly.
+* Level 2 - Unit (block) test: checking whether each block delivers the correct output based on provided input combinations.
+* Level 3 - System tests: observing interactions between functional blocks and the general outputs of the system; gathering data for performance analysis.
+
+### Level 1: Component Level Testing
+
+| Test | Context | Result |
+| :--- | :--- | :---: |
+| **Components Test** | Toggle the three LEDs each 500ms | **Passed** |
+| | Enable the buzzer to signal | **Passed** |
+| | Display the string “Hello” onto LCD | **Passed** |
+| | Transmit the string “UART functions normally!” | **Passed** |
+
+---
+
+### Level 2: Unit (Block) Testing
+
+| Test | Context | Result |
+| :--- | :--- | :---: |
+| **Input Block** | Trigger the HC-SR04 20 times, collect raw distance, and check the state updates | **Passed** |
+| **Display and Communication Block** | Sequentially provide four distinct state data (S/W/D/OOR), observe the LCD display string and the UART log | **Passed** |
+| **Actuators Block** | Sequentially provide four distinct state data (S/W/D/OOR), check for the reaction of LEDs and Buzzer | **Passed** |
+
+---
+
+### Level 3: System Testing
+
+#### Surface Properties
+| Test Scenario | Context / Observation | Result |
+| :--- | :--- | :--- |
+| **Purely flat, perpendicular surface** | Baseline accuracy | Average errors = 1.81% |
+| **Curved surface** | Error is relatively large with near objects (2cm, 19%) and decreases for further cases | Average error = 1.86% (further cases) |
+| **Deformed surface** | Error is relatively large with near objects (2cm, 49%) and decreases for further cases | Average error = 2.36% (further cases) |
+| **Empty box** | Wave is reflected at the bottom of the box instead of the nearest side as expected; error decreases as object gets further | Average error = 54.07% |
+
+#### Surface Angle
+| Test Scenario | Context / Observation | Result |
+| :--- | :--- | :--- |
+| **Inclined surface** | Angle with the vertical should be at most 15° for acceptably correct distance (<5%); error increases as angle increases | Max 15° (<5% error) |
+
+#### Surface Texture
+| Test Scenario | Context / Observation | Result |
+| :--- | :--- | :--- |
+| **Foam and mesh** | Sensor cannot detect reflected waves as the material has either absorbed or let it travel through | **OUT OF RANGE** |
+
+#### Field of View
+Place the obstacle at different positions not on the direct axis from the sensor and observe how far until reaching an incorrect distance (>5%).
+
+* **Horizontal:** Left: 14.0° | Right: 15.4°
+* **Vertical:** Up: 12.7° | Down: 14.9°
+
+---
+
+### Conclusion
+
+* **Successfully fulfilled correct distance estimation target:** Final product can properly detect most solid obstacles and calculate the distance in a range of 2–400cm, with an average error less than 5%.
+* **Smoothly implemented state-based warning logic:** The FSM transition is correct at turning points (20cm, 50cm, and 400cm); the warning state is consistent between channels (LEDs, Buzzer, LCD Display, and UART Log).
+* **Reliably maintained communication operation:** The system can operate continuously for 30 minutes without lockup conditions; data is periodically transmitted through UART and I2C.
+* **Explicitly identified physical limits of the sensors:** Test cases covered four major variables including surface properties, angle, texture, and field of view, indicating the limits of ultrasonic waves for each type of surface encountered.

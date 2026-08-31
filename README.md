@@ -1,5 +1,5 @@
 ## Project Overview
-This project implements STM32 into an obstacle warning system for vehicles. It triggers the ultrasonic waves, detects obstacles and calculates how far the objects are using the reflected ECHO signal. Based on real-time distance, it warns the user through multiple channels, including LEDs, buzzer, and LCD display. The system also transmits data logs periodically to the server using the U-ART interface, reporting realistic operation data for testing and future developments.
+This project implements STM32 into an obstacle warning system for vehicles. It triggers the ultrasonic waves, detects obstacles and calculates how far the objects are using the reflected ECHO signal. Based on real-time distance, it warns the user through multiple channels, including LEDs, Buzzer, and LCD display. The system also transmits data logs periodically to the server using the U-ART interface, reporting realistic operation data for testing and future developments.
 
 ## Learning Objectives
 * Practice embedded C programming on STM32 with HAL library.
@@ -116,18 +116,18 @@ The demo video demonstating how the system operates and delivers warning signal 
 
 ## Performance Analysis
 The testing is carried out under 3 stages:
-* Level 1 - Components test: ensuring each component performs its function properly.
-* Level 2 - Unit (block) test: checking whether each block delivers the correct output based on provided input combinations.
-* Level 3 - System tests: observing interactions between functional blocks and the general outputs of the system; gathering data for performance analysis.
+* Level 1 - Components testing: ensuring each component performs its function properly.
+* Level 2 - Unit (block) testing: checking whether each block delivers the correct output based on provided input combinations.
+* Level 3 - System testing: observing interactions between functional blocks and the general outputs of the system; gathering data for performance analysis.
 
-### Level 1: Component Level Testing
+### Level 1: Component testing
 
 | Test | Context | Result |
 | :--- | :--- | :---: |
-| **Components Test** | Toggle the three LEDs each 500ms | **Passed** |
-| | Enable the buzzer to signal | **Passed** |
-| | Display the string “Hello” onto LCD | **Passed** |
-| | Transmit the string “UART functions normally!” | **Passed** |
+| **LEDs test** | Toggle the three LEDs each 500ms | **Passed** |
+| **Buzzer test** | Enable the buzzer to signal | **Passed** |
+| **LCD test** | Display the string “Hello” onto LCD | **Passed** |
+| **U-ART test** | Transmit the string “UART functions normally!” | **Passed** |
 
 ---
 
@@ -136,7 +136,7 @@ The testing is carried out under 3 stages:
 | Test | Context | Result |
 | :--- | :--- | :---: |
 | **Input Block** | Trigger the HC-SR04 20 times, collect raw distance, and check the state updates | **Passed** |
-| **Display and Communication Block** | Sequentially provide four distinct state data (S/W/D/OOR), observe the LCD display string and the UART log | **Passed** |
+| **Display and Communications Block** | Sequentially provide four distinct state data (S/W/D/OOR), observe the LCD display string and the UART log | **Passed** |
 | **Actuators Block** | Sequentially provide four distinct state data (S/W/D/OOR), check for the reaction of LEDs and Buzzer | **Passed** |
 
 ---
@@ -175,3 +175,22 @@ Place the obstacle at different positions not on the direct axis from the sensor
 * **Smoothly implemented state-based warning logic:** The FSM transition is correct at turning points (20cm, 50cm, and 400cm); the warning state is consistent between channels (LEDs, Buzzer, LCD Display, and UART Log).
 * **Reliably maintained communication operation:** The system can operate continuously for 30 minutes without lockup conditions; data is periodically transmitted through UART and I2C.
 * **Explicitly identified physical limits of the sensors:** Test cases covered four major variables including surface properties, angle, texture, and field of view, indicating the limits of ultrasonic waves for each type of surface encountered.
+
+## Limitations and Future Developments
+### Limitations
+
+* **Sensor Physical Constraints:** The HC-SR04 may encounter echo noise issues, making it difficult to detect sound-absorbing materials (e.g., foam, mesh) or inclined surfaces beyond its angular threshold.
+* **Concurrency & Resource Management:** Interrupt handling may lead to resource conflicts when scaling to a multi-sensor setup. Simultaneous activation of all peripherals can also cause significant supply voltage drops.
+
+---
+
+### Future Developments
+
+* **Hardware Optimization:** Implement external power management featuring buck converter circuits to guarantee a stable 3.3V / 5V rail voltage under peak peripheral loads. Explore higher-precision distance sensors to improve overall ranging accuracy.
+* **Software Architecture:** Refine the Nested Vectored Interrupt Controller (NVIC) priority hierarchy to eliminate interrupt preemption conflicts:  
+  `Timer Input Capture` $\rightarrow$ `SysTick / UART` $\rightarrow$ `EXTI (Button)`
+
+## Authors:
+* Huynh Nhat Nam
+* Pham Minh Huy
+* Than Duc Phat

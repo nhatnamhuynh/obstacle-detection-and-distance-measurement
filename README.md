@@ -1,3 +1,12 @@
+## Project Overview
+This project implements STM32 into an obstacle warning system for vehicles. It triggers the ultrasonic waves, detects obstacles and calculates how far the objects are using the reflected ECHO signal. Based on real-time distance, it warns the user through multiple channels, including LEDs, buzzer, and LCD display. The system also transmits data logs periodically to the server using the U-ART interface, reporting realistic operation data for testing and future developments.
+## Learning Objectived
+* Practice embedded C programming on STM32 with HAL library.
+* Understanding and applying Timers, Input Capture, Interrupts, I2C, U-ART, PWM, GPIO into a practical project.
+* Design a finite state machine for distance-based warning states.
+* Implement a non-blocking main loop using time-driven events.
+* Apply logical framework into utilizing the overall system and deliver cutting-edge test cases. 
+* Enhance documentation and project presentation.
 ## Hardware Implementation
 ## 3. Hardware
 

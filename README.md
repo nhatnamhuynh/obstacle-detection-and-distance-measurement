@@ -1,7 +1,7 @@
-## Project Overview
+## 1. Project Overview
 This project implements STM32 into an obstacle warning system for vehicles. It triggers the ultrasonic waves, detects obstacles and calculates how far the objects are using the reflected ECHO signal. Based on real-time distance, it warns the user through multiple channels, including LEDs, Buzzer, and LCD display. The system also transmits data logs periodically to the server using the U-ART interface, reporting realistic operation data for testing and future developments.
 
-## Learning Objectives
+## 2. Learning Objectives
 * Practice embedded C programming on STM32 with HAL library.
 * Understanding and applying Timers, Input Capture, Interrupts, I2C, U-ART, PWM, GPIO into a practical project.
 * Design a finite state machine for distance-based warning states.
@@ -9,7 +9,6 @@ This project implements STM32 into an obstacle warning system for vehicles. It t
 * Apply logical framework into utilizing the overall system and deliver cutting-edge test cases. 
 * Enhance documentation and project presentation.
 
-## Hardware Implementation
 ## 3. Hardware
 
 ### 3.1. Overview
@@ -53,9 +52,9 @@ Các ngoại vi được kết nối với vi điều khiển STM32 thông qua c
 ![Front PCB Layout](Picture/[MLIoT%20Project]%20Front%20PCB.png)
 ![Back PCB Layout](Picture/[MLIoT%20Project]%20Back%20PCB.png)
 
-## Software Implementation
+## 4. Software Implementation
 
-### 1. Overview: Development Tools and Libraries
+### 4.1. Overview: Development Tools and Libraries
 The software architecture is built on a bare-metal approach, utilizing hardware interrupts instead of software delays to optimize CPU waiting time. The development environment and toolchain consist of:
 *   **IDE & Code Editor:** Visual Studio Code.
 *   **Configuration & Initialization:** STM32CubeMX.
@@ -63,11 +62,11 @@ The software architecture is built on a bare-metal approach, utilizing hardware 
 *   **Flashing & Debugging Tool:** STM32CubeProgrammer CLI (Automated via custom `build_and_flash` shell/batch scripts).
 *   **Core Libraries:** Hardware Abstraction Layer (HAL) and Standard C Libraries.
 
-### 2. System Block Diagram
+### 4.2. System Block Diagram
 
 ![System Block Diagram](<Picture/[MLIoT Project] Main Code Flow.png>) 
 
-### 3. Warning State Machine (FSM)
+### 4.3. Warning State Machine (FSM)
 The system utilizes a Finite State Machine (FSM) to classify spatial data into discrete zones and trigger multi-channel alerts (LED and Buzzer).
 
 *   **State 1 - Safe State ($S \ge 50$ cm):** 
@@ -86,7 +85,7 @@ The system utilizes a Finite State Machine (FSM) to classify spatial data into d
 #### State Diagram:
 ![State Diagram](<Picture/[MLIoT Project] State Diagram.png>)
 
-### 4. Signal Acquisition & Processing Flow
+### 4.4. Signal Acquisition & Processing Flow
 The obstacle detection logic relies on hardware time-stamping and digital filtering to ensure high precision with an average error of less than 5%.
 
 *   **Triggering:** The STM32 sends a signal to the HC-SR04 to emit an ultrasonic wave by pulling the TRIG pin HIGH for $10\mu s$, then pulling it LOW.
@@ -95,7 +94,7 @@ The obstacle detection logic relies on hardware time-stamping and digital filter
 *   **Distance Calculation:** The distance is calculated using the formula $S = \frac{v \times \Delta t}{2}$ (where $v = 0.0343$ cm/$\mu s$, accounting for the round-trip travel of the sound wave).
 *   **Digital Filtering:** A Moving Average Filter is applied using the 5 most recent samples ($N=5$) to smooth the data and eliminate sudden noise spikes.
 
-### 5. Timing & Interrupt Design
+### 4.5. Timing & Interrupt Design
 To maintain real-time performance without an RTOS, the system relies heavily on peripheral timers and a strict interrupt priority hierarchy.
 
 *   **Timer Input Capture:** Utilized specifically to measure the Echo pulse width duration for distance calculation.
@@ -110,17 +109,17 @@ To maintain real-time performance without an RTOS, the system relies heavily on 
 <!-- *   **NVIC Priority Configuration:** The Nested Vectored Interrupt Controller (NVIC) is structured with Timer IC having the highest priority, followed by SysTick, then UART, and finally the EXTI Button with the lowest priority. -->
 *   **Timeout & Exception Handling:** Any distance metric exceeding $400\text{ cm}$ automatically transitions the system into the `OUT_OF_RANGE` state. Furthermore, if a new $50\text{ ms}$ trigger cycle begins while the previous Echo measurement is still incomplete (`is_first_captured == 1`), the system detects a missing falling edge and automatically overrides `echo_time_us` to $24,000\ \mu\text{s}$ ($\approx 411.6\text{ cm}$). This forces an immediate `OUT_OF_RANGE` state, resetting the Input Capture state machine and preventing timer corruption.
 
-## Final Product
+## 5. Final Product
 The demo video demonstating how the system operates and delivers warning signal through LEDs, Buzzer, LCD Display, and U-ART log:
 ▶️ [Obstacle Detection and Distance Measurement](https://youtu.be/Erm0Eq_RM2c?si=jHDenFR6_XJYcfAd)
 
-## Performance Analysis
+## 6. Performance Analysis
 The testing is carried out under 3 stages:
 * Level 1 - Components testing: ensuring each component performs its function properly.
 * Level 2 - Unit (block) testing: checking whether each block delivers the correct output based on provided input combinations.
 * Level 3 - System testing: observing interactions between functional blocks and the general outputs of the system; gathering data for performance analysis.
 
-### Level 1: Component testing
+### 6.1. Level 1: Component testing
 
 | Test | Context | Result |
 | :--- | :--- | :---: |
@@ -131,7 +130,7 @@ The testing is carried out under 3 stages:
 
 ---
 
-### Level 2: Unit (Block) Testing
+### 6.2. Level 2: Unit (Block) Testing
 
 | Test | Context | Result |
 | :--- | :--- | :---: |
@@ -141,7 +140,7 @@ The testing is carried out under 3 stages:
 
 ---
 
-### Level 3: System Testing
+### 6.3. Level 3: System Testing
 
 #### Surface Properties
 | Test Scenario | Context / Observation | Result |
@@ -169,27 +168,27 @@ Place the obstacle at different positions not on the direct axis from the sensor
 
 ---
 
-### Conclusion
+### 6.4. Conclusion
 
 * **Successfully fulfilled correct distance estimation target:** Final product can properly detect most solid obstacles and calculate the distance in a range of 2–400cm, with an average error less than 5%.
 * **Smoothly implemented state-based warning logic:** The FSM transition is correct at turning points (20cm, 50cm, and 400cm); the warning state is consistent between channels (LEDs, Buzzer, LCD Display, and UART Log).
 * **Reliably maintained communication operation:** The system can operate continuously for 30 minutes without lockup conditions; data is periodically transmitted through UART and I2C.
 * **Explicitly identified physical limits of the sensors:** Test cases covered four major variables including surface properties, angle, texture, and field of view, indicating the limits of ultrasonic waves for each type of surface encountered.
 
-## Limitations and Future Developments
-### Limitations
+## 7. Limitations and Future Developments
+### 7.1. Limitations
 
 * The HC-SR04 may encounter echo noises, making it difficult to detect sound-obsorbing materials or inclined surfaces.
 * The interrupts may lead to conflicts when scaling this system to a larger one, with multiple sensors. It can also cause extreme power drop when all peripherals are active at the same time.
 
 ---
 
-### Future developments
+### 7.2. Future developments
 
 * **Hardware:** supply external power with bucking circuits to ensure stable 3.3V/5V voltage (depending on each component) during operation; consider other sensors for more precise distance calculations.
 * **Software:** tightly configure the Nested Vectored Interrupt Controller (NVIC) to avoid conflicts: `Timer Input Capture` $\rightarrow$ `SysTick / UART` $\rightarrow$ `EXTI (Button)`
 
-## Authors:
+## 8. Authors:
 * Huynh Nhat Nam
 * Pham Minh Huy
 * Than Duc Phat

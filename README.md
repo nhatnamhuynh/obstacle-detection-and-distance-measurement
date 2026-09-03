@@ -55,7 +55,7 @@ Các ngoại vi được kết nối với vi điều khiển STM32 thông qua c
 ## 4. Software Implementation
 
 ### 4.1. Overview: Development Tools and Libraries
-The software architecture is built on a bare-metal approach, utilizing hardware interrupts instead of software delays to optimize CPU waiting time. The development environment and toolchain consist of:
+The software architecture employs a non-blocking, interrupt-driven design, substituting hardware interrupts for blocking software delays to minimize CPU idle time. The development environment and toolchain consist of:
 *   **IDE & Code Editor:** Visual Studio Code.
 *   **Configuration & Initialization:** STM32CubeMX.
 *   **Compiler & Build System:** Arm GNU Toolchain, CMake, and Ninja.
@@ -64,7 +64,7 @@ The software architecture is built on a bare-metal approach, utilizing hardware 
 
 ### 4.2. System Block Diagram
 
-![System Block Diagram](<Picture/[MLIoT Project] Main Code Flow.png>) 
+![System Block Diagram](<Picture/[MLIoT Project] Main Code Flow - Eng.png>) 
 
 ### 4.3. Warning State Machine (FSM)
 The system utilizes a Finite State Machine (FSM) to classify spatial data into discrete zones and trigger multi-channel alerts (LED and Buzzer).

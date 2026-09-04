@@ -54,14 +54,14 @@ void LED_Update(Led_t *led, SystemState_t state) {
         case STATE_WARNING: 
             if (current_time - led->last_toggle_time >= 500) {
                 led->last_toggle_time = current_time;
-                led->toggle_flag = !led->toggle_flag; // Đảo trạng thái cờ
+                led->toggle_flag = !led->toggle_flag; // toggle flag
                 Led_WritePin(led->yellow_port, led->yellow_pin, led->toggle_flag);
             }
             break;
         case STATE_DANGER:
             if (current_time - led->last_toggle_time >= 100) {
                 led->last_toggle_time = current_time;
-                led->toggle_flag = !led->toggle_flag; // Đảo trạng thái cờ
+                led->toggle_flag = !led->toggle_flag; // toggle flag
                 Led_WritePin(led->red_port, led->red_pin, led->toggle_flag);
             }
             break;

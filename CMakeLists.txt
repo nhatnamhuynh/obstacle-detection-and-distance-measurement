@@ -52,6 +52,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Src/ultrasonic.c
     Core/Src/moving_filter.c
+    Core/Src/median_filter.c
     Core/Src/buzzer.c
     Core/Src/led.c
     Core/Src/fsm_alarm.c

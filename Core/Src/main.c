@@ -118,9 +118,9 @@ int main(void)
   MX_USART1_UART_Init();
 /* USER CODE BEGIN 2 */
   LED_Init (&g_led, 
-            GPIOB, GPIO_PIN_3, //green = PB3
+            GPIOB, GPIO_PIN_5, //green = PB5
             GPIOB, GPIO_PIN_4, // yellow = PB4
-            GPIOB, GPIO_PIN_5); // red = PB5
+            GPIOB, GPIO_PIN_3); // red = PB3
   
   Buzzer_Init (&g_buzzer, &htim4, TIM_CHANNEL_3); // buzzer = TIM4_CH3
 

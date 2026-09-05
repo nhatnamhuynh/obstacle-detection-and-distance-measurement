@@ -10,7 +10,7 @@
 #define PIN_EN (1 << 2)
 #define BACKLIGHT_BIT (1 << 3)
 
-#define LCD_INTERVAL_MS 200
+#define LCD_INTERVAL_MS 250
 
 void LCD_Init(void);
 void LCD_Clear(void);

@@ -92,11 +92,11 @@ void Error_Handler(void);
 #define ECHO_PORT GPIOA
 
 // LED
-#define LED_GREEN_PIN GPIO_PIN_3   // PB3 (Safe)
+#define LED_GREEN_PIN GPIO_PIN_5   // PB5 (Safe)
 #define LED_GREEN_PORT GPIOB
 #define LED_YELLOW_PIN GPIO_PIN_4  // PB4 (Warning)
 #define LED_YELLOW_PORT GPIOB
-#define LED_RED_PIN GPIO_PIN_5     // PB5 (Danger)
+#define LED_RED_PIN GPIO_PIN_3     // PB3 (Danger)
 #define LED_RED_PORT GPIOB
 
 // Button and PWM Buzzer

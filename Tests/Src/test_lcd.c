@@ -14,7 +14,7 @@ void Test_LCD_I2C(void) {
     LCD_SetCursor(0, 0);
     LCD_SendString("Hello");
     
-    HAL_Delay(2000); // Giữ chữ 2 giây để quan sát
+    HAL_Delay(2000);
     LCD_Clear();
 
     char msg_end[] = "[TEST] LCD I2C Test PASSED!\r\n";

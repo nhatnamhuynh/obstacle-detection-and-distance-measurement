@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "ultrasonic.h"
 #include "moving_filter.h"
+#include "median_filter.h"
 #include "buzzer.h"
 #include "led.h"
 #include "fsm_alarm.h"
@@ -117,9 +118,9 @@ int main(void)
   MX_USART1_UART_Init();
 /* USER CODE BEGIN 2 */
   LED_Init (&g_led, 
-            GPIOB, GPIO_PIN_3, //green = PB3
+            GPIOB, GPIO_PIN_5, //green = PB5
             GPIOB, GPIO_PIN_4, // yellow = PB4
-            GPIOB, GPIO_PIN_5); // red = PB5
+            GPIOB, GPIO_PIN_3); // red = PB3
   
   Buzzer_Init (&g_buzzer, &htim4, TIM_CHANNEL_3); // buzzer = TIM4_CH3
 
@@ -150,11 +151,12 @@ int main(void)
     //Interrupt for checking the sensor every 50ms
     if (Ultrasonic_Trigger()) {
       float raw_cm = Ultrasonic_ReadDistance();
-      float filtered_cm = MovingFilter_Update(&g_filter, raw_cm);
+      float filtered_cm = raw_cm;
+      // if want to test one filter, comment the other one's line
+      filtered_cm = MedianFilter_Update(filtered_cm); // median filter first
+      filtered_cm = MovingFilter_Update(&g_filter, filtered_cm);
 
       FSM_Update(filtered_cm, &g_data); // Update the FSM state and filtered distance
-
-      // add more functions that send data to the lcd screen
     }
 
 

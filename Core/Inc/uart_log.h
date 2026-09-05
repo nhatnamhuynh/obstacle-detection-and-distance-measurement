@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define LOG_INTERVAL_MS 200
+#define LOG_INTERVAL_MS 250
 
 void UART_Log_Init(void);
 void UART_Log_Process(const SensorData_t *sensor_data);

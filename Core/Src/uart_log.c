@@ -1,13 +1,11 @@
 #include "uart_log.h"
 
 void UART_Log_Init(void) {
-    // TODO: Send startup log via HAL_UART_Transmit(&huart1, ...)
     static const char init_data[] = "START LOGGING STATE DATA\r\n"; 
     HAL_UART_Transmit_IT(&huart1, (uint8_t *) init_data, sizeof(init_data) - 1);
 }
 
 void UART_Log_Process(const SensorData_t *sensor_data) {
-    // TODO: Check non-blocking 200ms timer with HAL_GetTick(), sprintf log string, send via huart1
     static uint32_t last_log = 0;
     uint32_t current_time = HAL_GetTick();
 

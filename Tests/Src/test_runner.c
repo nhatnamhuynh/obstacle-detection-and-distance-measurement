@@ -22,12 +22,11 @@ void TestRunner_RunAll(void) {
     char msg3[] = "==============================================\r\n";
     HAL_UART_Transmit(&huart1, (uint8_t*)msg3, strlen(msg3), HAL_MAX_DELAY);
 
-    Test_Buzzer_Beep();
-    HAL_Delay(1000);
-
     Test_LCD_I2C();
     HAL_Delay(1000);
     Test_3_LED_Blink();
+    HAL_Delay(1000);
+    Test_Buzzer_Beep();
     HAL_Delay(1000);
 
     Test_UART_Terminal(&huart1);

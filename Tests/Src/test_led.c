@@ -8,7 +8,6 @@ void Test_3_LED_Blink(void) {
     char msg_start[] = "[TEST] 3-LED Blink Test Started...\r\n";
     HAL_UART_Transmit(&huart1, (uint8_t*)msg_start, strlen(msg_start), HAL_MAX_DELAY);
 
-    // Chớp tắt 3 LED 3 lần để test
     for (int i = 0; i < 3; i++) {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5, GPIO_PIN_SET);
         HAL_Delay(500);

@@ -4,6 +4,8 @@
 > **Group:** Group 3 (Nhóm 3)  
 > **Target Microcontroller:** STM32F103C8T6 (ARM Cortex-M3)  
 
+
+
 ---
 
 ## 📌 Executive Summary & Project Context
@@ -52,19 +54,48 @@ This project develops a smart, real-time, high-precision embedded reversing warn
 
 ---
 
-## 🔬 Hardware Component Bill of Materials (BOM)
+## 3. Hardware
+
+### 3.1. Overview
+Below is the detailed Bill of Materials (BOM) used to build the system:
 
 | Component Category | Part / Module Name | Description / Specifications |
 | :--- | :--- | :--- |
-| **Microcontroller Board** | STM32F103C8T6 (Blue Pill) | ARM Cortex-M3 core @ $72\text{ MHz}$ |
+| **Microcontroller Board** | STM32F103C8T6 (Blue Pill) | ARM Cortex-M3 core @ 72 MHz |
 | **Programmer / Debugger** | ST-Link V2 | SWD programming & debugging interface |
-| **Primary Sensor** | HC-SR04 Ultrasonic Module | $2\text{ cm} - 400\text{ cm}$ range, $40\text{ kHz}$ acoustic frequency |
+| **Primary Sensor** | HC-SR04 Ultrasonic Module | 2 cm – 400 cm range, 40 kHz acoustic frequency |
 | **Display Interface** | 16x2 Character LCD + PCF8574 | I2C communication interface module |
 | **Acoustic Actuator** | Passive Piezoelectric Buzzer | Driven via Timer PWM |
-| **Visual Indicators** | 3x LEDs (Green, Yellow, Red) | Driven via GPIO with $220\Omega$ current-limiting resistors |
-| **User Input** | 1x Tactile Push-Button | Unit conversion ($cm/inch$), $10\text{k}\Omega$ pull-up resistor |
+| **Visual Indicators** | 3x LEDs (Green, Yellow, Red) | Driven via GPIO with 220Ω current-limiting resistors |
+| **User Input** | 1x Tactile Push-Button | Unit conversion (cm / inch), 10kΩ pull-up resistor |
 | **Serial Telemetry** | CP2102 USB-to-UART Module | Transmitting logs to Serial Terminal on PC |
-| **Software Toolchain** | VS Code, STM32CubeMX, Arm GNU Toolchain, CMake, Ninja, STM32 Programmer CLI |
+| **Software Toolchain** | VS Code, STM32CubeMX, Arm GNU Toolchain, CMake, Ninja, STM32 Programmer CLI| Software tools for programming and compilation |
+
+*Note:* The system uses an independent step-down power supply module to provide 5V (for the sensor and LCD) and a stable 3.3V for the STM32 microcontroller during operation, preventing voltage drops when peripherals are activated.
+
+### 3.2. Pinout Schematic
+The peripherals are connected to the STM32 microcontroller through the pin configuration on STM32CubeMX as follows:
+
+| Peripheral | Microcontroller Pin | Function |
+| :--- | :--- | :--- |
+| **HC-SR04 (Trig)** | `PA1` | GPIO Output |
+| **HC-SR04 (Echo)** | `PA0` | Timer Input Capture |
+| **Push-Button** | `PA2` | EXTI External Interrupt (Unit conversion) |
+| **Green LED (Safe)** | `PB3` | GPIO Output |
+| **Yellow LED (Warning)** | `PB4` | GPIO Output |
+| **Red LED (Danger)** | `PB5` | GPIO Output |
+| **Buzzer** | `PB8` | Timer PWM (Beep frequency control) |
+| **LCD 16x2 (SCL)** | `PB6` | I2C SCL |
+| **LCD 16x2 (SDA)** | `PB7` | I2C SDA |
+| **UART (TX)** | `PA9` | UART TX - Transmit log data to Terminal |
+| **UART (RX)** | `PA10` | UART RX - Receive data |
+
+### 3.3. PCB Layout
+* **Design Tool:** The project's PCB is professionally designed using **Altium Designer** software.
+* **Component Layout:** The board is logically divided into sections including: Headers for the Blue Pill microcontroller, UART module pins, HC-SR04 sensor, LCD screen, push-button area, buzzer, and a cluster of 3 terminal blocks for outputting signals to the warning LEDs.
+
+![Front PCB Layout](Picture/[MLIoT%20Project]%20Front%20PCB.png)
+![Back PCB Layout](Picture/[MLIoT%20Project]%20Back%20PCB.png)
 
 ---
 

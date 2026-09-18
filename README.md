@@ -12,7 +12,7 @@ This project implements STM32 into an obstacle warning system for vehicles. It t
 ## 3. Hardware
 
 ### 3.1. Overview
-Dưới đây là danh sách chi tiết các linh kiện phần cứng (BOM) được sử dụng để xây dựng hệ thống:
+Below is the detailed Bill of Materials (BOM) used to build the system:
 
 | Component Category | Part / Module Name | Description / Specifications |
 | :--- | :--- | :--- |
@@ -24,33 +24,35 @@ Dưới đây là danh sách chi tiết các linh kiện phần cứng (BOM) đ�
 | **Visual Indicators** | 3x LEDs (Green, Yellow, Red) | Driven via GPIO with 220Ω current-limiting resistors |
 | **User Input** | 1x Tactile Push-Button | Unit conversion (cm / inch), 10kΩ pull-up resistor |
 | **Serial Telemetry** | CP2102 USB-to-UART Module | Transmitting logs to Serial Terminal on PC |
-| **Software Toolchain** | VS Code, STM32CubeMX, Arm GNU Toolchain, CMake, Ninja, STM32 Programmer CLI| Các công cụ phần mềm phục vụ lập trình và biên dịch |
+| **Software Toolchain** | VS Code, STM32CubeMX, Arm GNU Toolchain, CMake, Ninja, STM32 Programmer CLI| Software tools for programming and compilation |
 
-*Lưu ý:* Hệ thống sử dụng mạch nguồn hạ áp độc lập để cấp điện áp 5V (cho cảm biến, màn hình LCD) và điện áp 3.3V ổn định cho vi điều khiển STM32 trong suốt quá trình vận hành, chống sụt áp khi ngoại vi kích hoạt.
+*Note:* The system uses an independent step-down power supply module to provide 5V (for the sensor and LCD) and a stable 3.3V for the STM32 microcontroller during operation, preventing voltage drops when peripherals are activated.
 
 ### 3.2. Pinout Schematic
-Các ngoại vi được kết nối với vi điều khiển STM32 thông qua cấu hình chân trên STM32CubeMX như sau:
+The peripherals are connected to the STM32 microcontroller through the pin configuration on STM32CubeMX as follows:
 
-| Ngoại vi (Peripheral) | Chân vi điều khiển | Chức năng (Function) |
+| Peripheral | Microcontroller Pin | Function |
 | :--- | :--- | :--- |
 | **HC-SR04 (Trig)** | `PA1` | GPIO Output |
 | **HC-SR04 (Echo)** | `PA0` | Timer Input Capture |
-| **Nút nhấn (Button)** | `PA2` | Ngắt ngoài EXTI (Đổi đơn vị đo)     |
-| **LED Xanh (Safe)** | `PB3` | GPIO Output |
-| **LED Vàng (Warning)** | `PB4` | GPIO Output |
-| **LED Đỏ (Danger)** | `PB5` | GPIO Output |
-| **Buzzer** | `PB8` | Timer PWM (Điều khiển tần suất bíp) |
+| **Push-Button** | `PA2` | EXTI External Interrupt (Unit conversion) |
+| **Green LED (Safe)** | `PB3` | GPIO Output |
+| **Yellow LED (Warning)** | `PB4` | GPIO Output |
+| **Red LED (Danger)** | `PB5` | GPIO Output |
+| **Buzzer** | `PB8` | Timer PWM (Beep frequency control) |
 | **LCD 16x2 (SCL)** | `PB6` | I2C SCL |
 | **LCD 16x2 (SDA)** | `PB7` | I2C SDA |
-| **UART (TX)** | `PA9` | UART TX - Truyền dữ liệu log lên Terminal|
-| **UART (RX)** | `PA10` | UART RX - Nhận dữ liệu|
+| **UART (TX)** | `PA9` | UART TX - Transmit log data to Terminal |
+| **UART (RX)** | `PA10` | UART RX - Receive data |
 
 ### 3.3. PCB Layout
-* **Công cụ thiết kế:** Mạch PCB của dự án được thiết kế chuyên nghiệp bằng phần mềm **Altium Designer**.
-* **Bố trí linh kiện (Layout):** Mạch được phân bổ hợp lý thành các khu vực gồm: Header cho vi điều khiển Blue Pill, chân cắm module UART, cảm biến HC-SR04, màn hình LCD, khu vực cho nút nhấn, còi buzzer và cụm 3 domino để xuất tín hiệu cho đèn LED cảnh báo.
+* **Design Tool:** The project's PCB is professionally designed using **Altium Designer** software.
+* **Component Layout:** The board is logically divided into sections including: Headers for the Blue Pill microcontroller, UART module pins, HC-SR04 sensor, LCD screen, push-button area, buzzer, and a cluster of 3 terminal blocks for outputting signals to the warning LEDs.
 
 ![Front PCB Layout](Picture/[MLIoT%20Project]%20Front%20PCB.png)
 ![Back PCB Layout](Picture/[MLIoT%20Project]%20Back%20PCB.png)
+
+---
 
 ## 4. Software Implementation
 
